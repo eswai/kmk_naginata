@@ -11,6 +11,8 @@ from kmk.scanners import DiodeOrientation
 from kmk.modules.layers import Layers
 from kmk.handlers.sequences import send_string
 from kmk.handlers.sequences import simple_key_sequence
+from kmk.modules.combos import Combos, Chord, Sequence
+from kmk.modules.holdtap import HoldTap
 
 keyboard = KMKKeyboard()
 
@@ -18,7 +20,15 @@ keyboard.col_pins = (board.GP15, board.GP14, board.GP13, board.GP12, board.GP11,
 keyboard.row_pins = (board.GP7, board.GP8, board.GP9, board.GP10,)
 keyboard.diode_orientation = DiodeOrientation.COL2ROW
 
-keyboard.modules.append(Layers())
+layers = Layers()
+keyboard.modules.append(layers)
+
+combos = Combos()
+keyboard.modules.append(combos)
+
+holdtap = HoldTap()
+holdtap.tap_time = 100
+keyboard.modules.append(holdtap)
 
 combo_layers = {
   (2, 3): 4,
@@ -39,6 +49,7 @@ kbuf = set() # 入力バッファ
 def ngpress(*args, **kwargs):
     print(args[0])
     kbuf.add(args[0])
+    return False
 
 def ngrelease(*args, **kwargs):
     print(args[0])
@@ -47,6 +58,21 @@ def ngrelease(*args, **kwargs):
           keyboard.tap_key(simple_key_sequence(a[1]))
           break
     kbuf.clear()
+    return False
+
+def naginata_on(*args, **kwargs):
+    layers.activate_layer(keyboard, 1)
+    kbuf.clear()
+    keyboard.tap_key(KC.LANG1)
+    keyboard.tap_key(KC.INT4)
+    return False
+
+def naginata_off(*args, **kwargs):
+    layers.deactivate_layer(keyboard, 1)
+    kbuf.clear()
+    keyboard.tap_key(KC.LANG2)
+    keyboard.tap_key(KC.INT5)
+    return False
 
 # キーの定義
 ngkeys = [
@@ -56,7 +82,15 @@ ngkeys = [
   'NGSFT'
 ]
 for k in ngkeys:
-    make_key(names=(k,),on_press=ngpress, on_release=ngrelease)
+    make_key(names=(k,), on_press=ngpress, on_release=ngrelease)
+
+make_key(names=('NGON' ,), on_release=naginata_on) # on_releaseの方が安定するような
+make_key(names=('NGOFF',), on_release=naginata_off)
+
+combos.combos = [
+  Chord((KC.H  , KC.J  ), KC.NGON , timeout=100, per_key_timeout=False, fast_reset=True),
+  Chord((KC.NGF, KC.NGG), KC.NGOFF, timeout=100, per_key_timeout=False, fast_reset=True),
+]
 
 # かな変換テーブル
 ngdic = [
@@ -249,14 +283,14 @@ keyboard.keymap = [
     KC.Q     ,KC.W     ,KC.E     ,KC.R     ,KC.T     ,KC.Y     ,KC.U     ,KC.I     ,KC.O     ,KC.P     ,
     KC.A     ,KC.S     ,KC.D     ,KC.F     ,KC.G     ,KC.H     ,KC.J     ,KC.K     ,KC.L     ,KC.SCLN  ,
     KC.Z     ,KC.X     ,KC.C     ,KC.V     ,KC.B     ,KC.N     ,KC.M     ,KC.COMM  ,KC.DOT   ,KC.SLSH  ,
-    KC.LCTL  ,KC.LSFT  ,KC.LGUI  ,LOWER    ,SSPC     ,SENT     ,RAISE    ,KC.RCTRL ,KC.RSFT  ,NGTG     ,
+    KC.LCTL  ,KC.LSFT  ,KC.LGUI  ,LOWER    ,SSPC     ,SENT     ,RAISE    ,KC.RCTRL ,KC.NGON  ,KC.NGOFF ,
   ],
   [
  # |---------+---------+---------+---------+---------+---------+---------+---------+---------+---------|
     KC.NGQ   ,KC.NGW   ,KC.NGE   ,KC.NGR   ,KC.NGT   ,KC.NGY   ,KC.NGU   ,KC.NGI   ,KC.NGO   ,KC.NGP   ,
     KC.NGA   ,KC.NGS   ,KC.NGD   ,KC.NGF   ,KC.NGG   ,KC.NGH   ,KC.NGJ   ,KC.NGK   ,KC.NGL   ,KC.NGSCLN,
     KC.NGZ   ,KC.NGX   ,KC.NGC   ,KC.NGV   ,KC.NGB   ,KC.NGN   ,KC.NGM   ,KC.NGCOMM,KC.NGDOT ,KC.NGSLSH,
-    KC.LCTL  ,KC.LSFT  ,KC.LGUI  ,LOWER    ,KC.NGSFT ,KC.NGSFT ,RAISE    ,KC.RCTRL ,KC.RSFT  ,NGTG     ,
+    KC.LCTL  ,KC.LSFT  ,KC.LGUI  ,LOWER    ,KC.NGSFT ,KC.NGSFT ,RAISE    ,KC.RCTRL ,KC.NGON  ,KC.NGOFF ,
   ],
   [
  # |---------+---------+---------+---------+---------+---------+---------+---------+---------+---------|
