@@ -3,6 +3,7 @@
 print("Starting")
 
 import board
+import time
 
 from kmk.kmk_keyboard import KMKKeyboard
 from kmk.keys import KC
@@ -41,31 +42,109 @@ SSPC = KC.HT(KC.SPC, KC.LSFT)
 SENT = KC.HT(KC.ENTER, KC.LSFT)
 NGTG = KC.TG(1)
 
-kbuf = set() # 入力バッファ
+pressed_keys = 0
+nginput = []
+
+class KeyAction:
+    def __init__(self, keycode, press_at, release_at):
+        self.keycode = keycode
+        self.press_at = press_at
+        self.release_at = release_at
+    
+    def release_at_t(self, t):
+        return self.release_at if self.release_at > 0 else t
 
 #　かな変換の処理
 def ng_press(*args, **kwargs):
-    kbuf.add(args[0])
+    global pressed_keys
+    kc = args[0]
+    pressed_keys += 1
+    nginput.append(KeyAction(kc, time.monotonic(), 0))
     return False
 
 def ng_release(*args, **kwargs):
-    for a in ngdic:
-        if a[0] == kbuf:
-            keyboard.tap_key(simple_key_sequence(a[1]))
+    global pressed_keys
+    kc = args[0]
+    if pressed_keys > 0:
+        pressed_keys -= 1
+    
+    # リリース時間保存
+    for ka in nginput:
+        if ka.keycode == kc and ka.release_at == 0:
+            ka.release_at = time.monotonic()
             break
-    kbuf.clear()
+
+    # かな変換
+    if pressed_keys == 0 and len(nginput) > 0:
+        s = simple_key_sequence(ngtype())
+        keyboard.tap_key(s)
+        nginput.clear()
+
     return False
+
+def ngtype():
+    lllka = [] # list(list(list(KeyAction)))
+    for lindex in ngcomb[len(nginput)]: # list(list(num))
+        llka = [] # list(list(KeyAction))
+        is_exist = False
+        for cindex in lindex: # list(num)
+            lka = [] # list(KeyAction)
+            llka.append(lka)
+            for i in cindex: # num
+                lka.append(nginput[i])
+            skc = set(map(lambda x: x.keycode, lka))
+            for k in ngdic: # (set(KC), list(KC))
+                if k[0] == skc:
+                    is_exist = True
+            if not is_exist:
+                break
+        if is_exist:
+            lllka.append(llka)
+    
+    best_score = 0
+    best_comb = [] # list(list(KeyAction))
+    for c in lllka:
+        s = scoring(c)
+        if s >= best_score:
+            best_comb = c
+            best_score = s
+
+    keyseq = []
+    for k in best_comb:
+        s = set(map(lambda x: x.keycode, k))
+        for l in ngdic:
+            if l[0] == s:
+                keyseq += l[1]
+                break
+
+    return keyseq
+
+def scoring(comb): #list(list(KeyAction))
+    score = 0
+    now = time.monotonic()
+    for lka in comb: # list(KeyAction)
+        if len(lka) == 1:
+            score = 100
+        else:
+            latest_press = max(map(lambda x: x.press_at, lka))
+            earliest_release = min(map(lambda x: x.release_at_t(now), lka))
+            overlap = earliest_release - latest_press
+            for ka in lka:
+                score += overlap * 1000 / (ka.release_at_t(now) - ka.press_at)
+    
+    return score / len(comb)
+        
 
 def naginata_on(*args, **kwargs):
     layers.activate_layer(keyboard, 1)
-    kbuf.clear()
+    nginput.clear()
     keyboard.tap_key(KC.LANG1)
     keyboard.tap_key(KC.INT4)
     return False
 
 def naginata_off(*args, **kwargs):
     layers.deactivate_layer(keyboard, 1)
-    kbuf.clear()
+    nginput.clear()
     keyboard.tap_key(KC.LANG2)
     keyboard.tap_key(KC.INT5)
     return False
@@ -272,6 +351,96 @@ ngdic = [
     ({KC.NGF   , KC.NGH   , KC.NGDOT  }, [KC.G, KC.U, KC.X, KC.W, KC.A  ]), # ぐゎ
     ({KC.NGV   , KC.NGL   , KC.NGJ    }, [KC.T, KC.S, KC.A              ]), # つぁ
 ]
+
+ngcomb = {
+    1: [ # 1キー
+        [[0      ]], # 0
+    ],
+    2: [ # 2キー
+        [[0      ], [1      ]], # 0 1
+        [[0, 1   ]           ], # 01
+    ],
+    3: [ # 3キー
+        # 連続シフトなし
+        [[0      ], [1      ], [2      ]], # 0   1   2
+        [[0, 1   ], [2      ]           ], # 01  2
+        [[0      ], [1, 2   ]           ], # 0   12
+        [[0, 1, 2]                      ], # 012
+        # 連続シフトあり
+        [[0, 1   ], [0, 2   ]           ], # 01  02 : 0が連続シフト
+        [[0, 1   ], [1, 2   ]           ], # 01  12 : 1が連続シフト
+    ],
+    4: [ # 4キー
+        # 連続シフトなし
+        [[0      ], [1      ], [2      ], [3      ]], # 0   1   2   3
+        [[0, 1   ], [2      ], [3      ]           ], # 01  2   3
+        [[0      ], [1, 2   ], [3      ]           ], # 0   12  3
+        [[0      ], [1      ], [2, 3   ]           ], # 0   1   23
+        [[0, 1, 2], [3      ]                      ], # 012 3
+        [[0, 1   ], [2, 3   ]                      ], # 01  23
+        [[0      ], [1, 2, 3]                      ], # 0   123
+        # 0の連続シフト
+        [[0, 1   ], [0, 2   ], [0, 3   ]           ], # 01  02  03
+        [[0, 1   ], [0, 2   ], [3      ]           ], # 01  02  3
+        [[0, 1, 2], [0, 3   ]                      ], # 012 03
+        [[0, 1   ], [0, 2, 3]                      ], # 01  023
+        # 1の連続シフト
+        [[0, 1   ], [1, 2   ], [3      ]           ], # 01  12  3
+        [[0, 1   ], [1, 2   ], [1, 3   ]           ], # 01  12  13
+        [[0      ], [1, 2   ], [1, 3   ]           ], # 0   12  13
+        [[0, 1   ], [1, 2, 3]                      ], # 01  123
+        [[0, 1, 2], [1, 3   ]                      ], # 012 13
+        # 2の連続シフト
+        [[0      ], [1, 2   ], [2, 3   ]           ], # 0   12  23
+        [[0, 1, 2], [2, 3   ]                      ], # 012 23
+    ],
+    5: [ # 5キー
+        # 5分割 連続シフトなし
+        [[0      ], [1      ], [2      ], [3      ], [4      ]], # 0 1 2 3 4
+        # 4分割 連続シフトなし
+        [[0, 1   ], [2      ], [3      ], [4      ]           ], # 01  2   3   4
+        [[0      ], [1, 2   ], [3      ], [4      ]           ], # 0   12  3   4
+        [[0      ], [1      ], [2, 3   ], [4      ]           ], # 0   1   23  4
+        [[0      ], [1      ], [2      ], [3, 4   ]           ], # 0   1   2   34
+        # 3分割 連続シフトなし
+        [[0, 1, 2], [3      ], [4      ]                      ], # 012 3   4
+        [[0      ], [1, 2, 3], [4      ]                      ], # 0   123 4
+        [[0      ], [1      ], [2, 3, 4]                      ], # 0   1   234
+        [[0, 1   ], [2, 3   ], [4      ]                      ], # 01  23  4
+        [[0      ], [1, 2   ], [3, 4   ]                      ], # 0   12  34
+        [[0, 1   ], [2      ], [3, 4   ]                      ], # 01  2   34
+        # 2分割 連続シフトなし
+        [[0, 1, 2], [3, 4   ]                                 ], # 012 34
+        [[0, 1   ], [2, 3, 4]                                 ], # 01  234
+        # 0の連続シフト
+        [[0, 1   ], [0, 2   ], [3      ], [4      ]           ], # 01  02  3   4 : 2キー同時
+        [[0, 1   ], [0, 2   ], [0, 3   ], [4      ]           ], # 01  02  03  4
+        [[0, 1   ], [0, 2   ], [0, 3   ], [0, 4   ]           ], # 01  02  03  04
+        [[0, 1, 2], [0, 3, 4]                                 ], # 012 034 : 3キー同時
+        [[0, 1   ], [0, 2, 3], [4      ]                      ], # 01  023 4
+        [[0, 1   ], [0, 2, 3], [0, 4   ]                      ], # 01  023 04
+        [[0, 1   ], [0, 2   ], [0, 3, 4]                      ], # 01  02  034
+        # 1の連続シフト
+        [[0, 1   ], [1, 2   ], [3      ], [4      ]           ], # 01  12  3   4 : 2キー同時
+        [[0, 1   ], [1, 2   ], [1, 3   ], [4      ]           ], # 01  12  13  4
+        [[0, 1   ], [1, 2   ], [1, 3   ], [1, 4   ]           ], # 01  12  13  14
+        [[0      ], [1, 2   ], [1, 3   ], [4      ]           ], # 0   12  13  4
+        [[0      ], [1, 2   ], [1, 3   ], [1, 4   ]           ], # 0   12  13  14
+        [[0, 1, 2], [1, 3, 4]                                 ], # 012 134 : 3キー同時
+        [[0, 1, 2], [1, 3   ], [4      ]                      ], # 012 13  4
+        [[0      ], [1, 2, 3], [1, 4   ]                      ], # 0   123 14
+        [[0      ], [1, 2   ], [1, 3, 4]                      ], # 0   12  134
+        # 2の連続シフト
+        [[0      ], [1, 2   ], [2, 3   ], [4      ]           ], # 0   12  23 4 : 2キー同時
+        [[0      ], [1      ], [2, 3   ], [2, 4   ]           ], # 0   1   23 24
+        [[0, 1, 2], [2, 3, 4]                                 ], # 012 234 : 3キー同時
+        [[0      ], [1, 2   ], [2, 3, 4]                      ], # 0   12  234
+        [[0      ], [1, 2, 3], [2, 4   ]                      ], # 0   123 24
+        # 3の連続シフト
+        [[0      ], [1      ], [2, 3   ], [3, 4   ]           ], # 0   1   23  34 : 2キー
+        [[0      ], [1, 2, 3], [3, 4   ]                      ], # 0   123 34 : 3キー同時
+    ],
+}
 
 keyboard.keymap = [
     [
