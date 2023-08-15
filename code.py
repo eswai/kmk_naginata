@@ -97,7 +97,7 @@ def ng_release(*args, **kwargs):
             ka.release_at = now
             break
 
-    # かな変換
+    # かな変換し出力
     if pressed_keys == 0 and len(nginput) > 0:
         ng_type()
         nginput.clear()
@@ -105,18 +105,18 @@ def ng_release(*args, **kwargs):
     return False
 
 def ng_type(partial = False):
-
+    # partial nginputの全部を出力するか、最初だけ出力するか
     if len(nginput) == 1 and nginput[0].keycode == KC.NGSFT2:
         keyboard.tap_key(KC.ENT)
         return 1
 
+    # キーの組合せから、辞書にあるものだけを抜き出す
     lllka = [] # list(list(list(KeyAction)))
     for lindex in ngcomb[len(nginput)]: # list(list(num))
         llka = [] # list(list(KeyAction))
         is_exist = True
         for cindex in lindex: # list(num)
             lka = [] # list(KeyAction)
-            llka.append(lka)
             for i in cindex: # num
                 lka.append(nginput[i])
             skc = set(map(lambda x: x.keycode_s(), lka))
@@ -125,11 +125,12 @@ def ng_type(partial = False):
                     break
             else:
                 is_exist = False
-            if not is_exist:
                 break
+            llka.append(lka)
         if is_exist:
             lllka.append(llka)
     
+    # 組み合わせの点数づけをして、点数の高い組合せを選ぶ
     best_score = 0
     best_comb = [] # list(list(KeyAction))
     for c in lllka:
@@ -139,10 +140,11 @@ def ng_type(partial = False):
             best_score = s
 
     if partial:
-        bc = [best_comb[0]]
+        bc = [best_comb[0]] # 最初の組合せだけ変換する
     else:
         bc = best_comb
 
+    # かなに変換する
     keyseq = []    
     for k in bc:
         s = set(map(lambda x: x.keycode_s(), k))
