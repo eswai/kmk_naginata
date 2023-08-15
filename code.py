@@ -44,6 +44,8 @@ NGTG = KC.TG(1)
 
 pressed_keys = 0
 nginput = []
+max_keys = 5
+shift_keys = [KC.NGSFT, KC.NGSFT2, KC.NGF, KC.NGV, KC.NGJ, KC.NGM]
 
 class KeyAction:
     def __init__(self, keycode, press_at, release_at):
@@ -57,11 +59,30 @@ class KeyAction:
     def release_at_t(self, t):
         return self.release_at if self.release_at > 0 else t
 
+    def is_shift(self):
+        if self.keycode in shift_keys:
+            return True
+        else:
+            return False
+
 #　かな変換の処理
 def ng_press(*args, **kwargs):
     global pressed_keys
     kc = args[0]
     pressed_keys += 1
+
+    if pressed_keys > max_keys or len(nginput) >= max_keys:
+        s = ng_type(True)
+        t = False
+        for ka in nginput:
+            if ka.is_shift and ka.release_at == 0:
+                ka.press_at = time.monotonic()
+                t = ka
+                break
+        del nginput[0:s]
+        if t:
+            nginput.insert(0, t)
+
     nginput.append(KeyAction(kc, time.monotonic(), 0))
     return False
 
@@ -79,16 +100,15 @@ def ng_release(*args, **kwargs):
 
     # かな変換
     if pressed_keys == 0 and len(nginput) > 0:
-        s = simple_key_sequence(ng_type())
-        keyboard.tap_key(s)
+        ng_type()
         nginput.clear()
 
     return False
 
-def ng_type():
+def ng_type(partial = False):
 
     if len(nginput) == 1 and nginput[0].keycode == KC.NGSFT2:
-        return [KC.ENT]
+        keyboard.tap_key(KC.ENT)
 
     lllka = [] # list(list(list(KeyAction)))
     for lindex in ngcomb[len(nginput)]: # list(list(num))
@@ -103,6 +123,7 @@ def ng_type():
             for k in ngdic: # (set(KC), list(KC))
                 if k[0] == skc:
                     is_exist = True
+                    break
             if not is_exist:
                 break
         if is_exist:
@@ -116,15 +137,24 @@ def ng_type():
             best_comb = c
             best_score = s
 
-    keyseq = []
-    for k in best_comb:
+    if partial:
+        bc = [best_comb[0]]
+    else:
+        bc = best_comb
+
+    keyseq = []    
+    for k in bc:
         s = set(map(lambda x: x.keycode_s(), k))
         for l in ngdic:
             if l[0] == s:
                 keyseq += l[1]
                 break
 
-    return keyseq
+    kcs = simple_key_sequence(keyseq)
+    keyboard.tap_key(kcs)
+
+    # 何キー処理したが返す
+    return sum(map(lambda x: len(x), bc))
 
 def scoring(comb): #list(list(KeyAction))
     score = 0
