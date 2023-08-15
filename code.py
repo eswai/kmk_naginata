@@ -244,6 +244,7 @@ ngdic = [
     ({KC.NGSFT , KC.NGU               }, [KC.S, KC.A                    ]), # さ
     ({KC.NGJ                          }, [KC.A                          ]), # あ
     ({KC.NGSFT , KC.NGE               }, [KC.R, KC.I                    ]), # り
+    ({KC.NGSLSH                       }, [KC.R, KC.E                    ]), # れ
     ({KC.NGSFT , KC.NGSLSH            }, [KC.R, KC.E                    ]), # れ
     ({KC.NGF   , KC.NGN               }, [KC.D, KC.A                    ]), # だ
     ({KC.NGSFT , KC.NGA               }, [KC.S, KC.E                    ]), # せ
@@ -260,8 +261,10 @@ ngdic = [
     ({KC.NGSFT , KC.NGS               }, [KC.M, KC.E                    ]), # め
     ({KC.NGJ   , KC.NGC               }, [KC.B, KC.A                    ]), # ば
     ({KC.NGSFT , KC.NGH               }, [KC.Y, KC.A                    ]), # や
+    ({KC.NGX                          }, [KC.H, KC.I                    ]), # ひ
     ({KC.NGSFT , KC.NGX               }, [KC.H, KC.I                    ]), # ひ
     ({KC.NGA                          }, [KC.R, KC.O                    ]), # ろ
+    ({KC.NGZ                          }, [KC.H, KC.O                    ]), # ほ
     ({KC.NGSFT , KC.NGZ               }, [KC.H, KC.O                    ]), # ほ
     ({KC.NGR   , KC.NGI               }, [KC.S, KC.Y, KC.O              ]), # しょ
     ({KC.NGF   , KC.NGSCLN            }, [KC.B, KC.U                    ]), # ぶ
