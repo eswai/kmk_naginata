@@ -209,109 +209,96 @@ combos.combos = [
 # かな変換テーブル setはdictionaryのキーにできないので配列に
 ngdic = [
     ({KC.NGU                          }, [KC.BSPC                       ]),
-    ({KC.NGT                          }, [KC.LEFT                       ]),
-    ({KC.NGY                          }, [KC.RIGHT                      ]),
-    ({KC.NGSFT , KC.NGT               }, [KC.LSFT(KC.LEFT)              ]),
-    ({KC.NGSFT , KC.NGY               }, [KC.LSFT(KC.RIGHT)             ]),
     ({KC.NGSFT                        }, [KC.SPC                        ]),
     ({KC.NGM   , KC.NGV               }, [KC.ENT                        ]),
-    ({KC.NGSFT , KC.NGM               }, [KC.DOT,  KC.ENT               ]),
-    ({KC.NGSFT , KC.NGV               }, [KC.COMM, KC.ENT               ]),
 
-    # 清音
-    ({KC.NGJ                          }, [KC.A                          ]), # あ
+    # 出現頻度順
     ({KC.NGK                          }, [KC.I                          ]), # い
     ({KC.NGL                          }, [KC.U                          ]), # う
-    ({KC.NGSFT , KC.NGO               }, [KC.E                          ]), # え
-    ({KC.NGSFT , KC.NGN               }, [KC.O                          ]), # お
-    ({KC.NGF                          }, [KC.K, KC.A                    ]), # か
-    ({KC.NGW                          }, [KC.K, KC.I                    ]), # き
-    ({KC.NGH                          }, [KC.K, KC.U                    ]), # く
-    ({KC.NGS                          }, [KC.K, KC.E                    ]), # け
-    ({KC.NGV                          }, [KC.K, KC.O                    ]), # こ
-    ({KC.NGSFT , KC.NGU               }, [KC.S, KC.A                    ]), # さ
+    ({KC.NGCOMM                       }, [KC.N, KC.N                    ]), # ん
     ({KC.NGR                          }, [KC.S, KC.I                    ]), # し
-    ({KC.NGO                          }, [KC.S, KC.U                    ]), # す
-    ({KC.NGSFT , KC.NGA               }, [KC.S, KC.E                    ]), # せ
-    ({KC.NGB                          }, [KC.S, KC.O                    ]), # そ
-    ({KC.NGN                          }, [KC.T, KC.A                    ]), # た
-    ({KC.NGSFT , KC.NGG               }, [KC.T, KC.I                    ]), # ち
-    ({KC.NGSFT , KC.NGL               }, [KC.T, KC.U                    ]), # つ
-    ({KC.NGE                          }, [KC.T, KC.E                    ]), # て
+    ({KC.NGF                          }, [KC.K, KC.A                    ]), # か
+    ({KC.NGSFT , KC.NGJ               }, [KC.N, KC.O                    ]), # の
     ({KC.NGD                          }, [KC.T, KC.O                    ]), # と
+    ({KC.NGN                          }, [KC.T, KC.A                    ]), # た
+    ({KC.NGSFT , KC.NGV               }, [KC.COMM, KC.ENT               ]), #  、
+    ({KC.NGE                          }, [KC.T, KC.E                    ]), # て
+    ({KC.NGH                          }, [KC.K, KC.U                    ]), # く
     ({KC.NGM                          }, [KC.N, KC.A                    ]), # な
     ({KC.NGSFT , KC.NGD               }, [KC.N, KC.I                    ]), # に
-    ({KC.NGSFT , KC.NGW               }, [KC.N, KC.U                    ]), # ぬ
-    ({KC.NGSFT , KC.NGR               }, [KC.N, KC.E                    ]), # ね
-    ({KC.NGSFT , KC.NGJ               }, [KC.N, KC.O                    ]), # の
+    ({KC.NGW                          }, [KC.K, KC.I                    ]), # き
     ({KC.NGC                          }, [KC.H, KC.A                    ]), # は
-    ({KC.NGX                          }, [KC.H, KC.I                    ]), # ひ
-    ({KC.NGSFT , KC.NGX               }, [KC.H, KC.I                    ]), # ひ
-    ({KC.NGSFT , KC.NGSCLN            }, [KC.H, KC.U                    ]), # ふ
-    ({KC.NGP                          }, [KC.H, KC.E                    ]), # へ
-    ({KC.NGZ                          }, [KC.H, KC.O                    ]), # ほ
-    ({KC.NGSFT , KC.NGZ               }, [KC.H, KC.O                    ]), # ほ
-    ({KC.NGSFT , KC.NGF               }, [KC.M, KC.A                    ]), # ま
-    ({KC.NGSFT , KC.NGB               }, [KC.M, KC.I                    ]), # み
-    ({KC.NGSFT , KC.NGCOMM            }, [KC.M, KC.U                    ]), # む
-    ({KC.NGSFT , KC.NGS               }, [KC.M, KC.E                    ]), # め
-    ({KC.NGSFT , KC.NGK               }, [KC.M, KC.O                    ]), # も
-    ({KC.NGSFT , KC.NGH               }, [KC.Y, KC.A                    ]), # や
-    ({KC.NGSFT , KC.NGP               }, [KC.Y, KC.U                    ]), # ゆ
-    ({KC.NGSFT , KC.NGI               }, [KC.Y, KC.O                    ]), # よ
-    ({KC.NGDOT                        }, [KC.R, KC.A                    ]), # ら
-    ({KC.NGSFT , KC.NGE               }, [KC.R, KC.I                    ]), # り
+    ({KC.NGV                          }, [KC.K, KC.O                    ]), # こ
     ({KC.NGI                          }, [KC.R, KC.U                    ]), # る
-    ({KC.NGSLSH                       }, [KC.R, KC.E                    ]), # れ
-    ({KC.NGSFT , KC.NGSLSH            }, [KC.R, KC.E                    ]), # れ
-    ({KC.NGA                          }, [KC.R, KC.O                    ]), # ろ
-    ({KC.NGSFT , KC.NGDOT             }, [KC.W, KC.A                    ]), # わ
-    ({KC.NGSFT , KC.NGC               }, [KC.W, KC.O                    ]), # を
-    ({KC.NGCOMM                       }, [KC.N, KC.N                    ]), # ん
-    ({KC.NGSCLN                       }, [KC.MINS                       ]), # ー
-
-    # 濁音
+    ({KC.NGSFT , KC.NGM               }, [KC.DOT,  KC.ENT               ]), # 。
     ({KC.NGJ   , KC.NGF               }, [KC.G, KC.A                    ]), # が
-    ({KC.NGJ   , KC.NGW               }, [KC.G, KC.I                    ]), # ぎ
-    ({KC.NGF   , KC.NGH               }, [KC.G, KC.U                    ]), # ぐ
-    ({KC.NGJ   , KC.NGS               }, [KC.G, KC.E                    ]), # げ
-    ({KC.NGJ   , KC.NGV               }, [KC.G, KC.O                    ]), # ご
-    ({KC.NGF   , KC.NGU               }, [KC.Z, KC.A                    ]), # ざ
-    ({KC.NGJ   , KC.NGR               }, [KC.Z, KC.I                    ]), # じ
-    ({KC.NGF   , KC.NGO               }, [KC.Z, KC.U                    ]), # ず
-    ({KC.NGJ   , KC.NGA               }, [KC.Z, KC.E                    ]), # ぜ
-    ({KC.NGJ   , KC.NGB               }, [KC.Z, KC.O                    ]), # ぞ
-    ({KC.NGF   , KC.NGN               }, [KC.D, KC.A                    ]), # だ
-    ({KC.NGJ   , KC.NGG               }, [KC.D, KC.I                    ]), # ぢ
-    ({KC.NGF   , KC.NGL               }, [KC.D, KC.U                    ]), # づ
     ({KC.NGJ   , KC.NGE               }, [KC.D, KC.E                    ]), # で
+    ({KC.NGG                          }, [KC.X, KC.T, KC.U              ]), # っ
+    ({KC.NGQ   , KC.NGI               }, [KC.X, KC.Y, KC.O              ]), # ょ
+    ({KC.NGO                          }, [KC.S, KC.U                    ]), # す
+    ({KC.NGSFT , KC.NGF               }, [KC.M, KC.A                    ]), # ま
+    ({KC.NGJ   , KC.NGR               }, [KC.Z, KC.I                    ]), # じ
+    ({KC.NGSFT , KC.NGE               }, [KC.R, KC.I                    ]), # り
+    ({KC.NGSFT , KC.NGK               }, [KC.M, KC.O                    ]), # も
+    ({KC.NGSFT , KC.NGL               }, [KC.T, KC.U                    ]), # つ
+    ({KC.NGSFT , KC.NGN               }, [KC.O                          ]), # お
+    ({KC.NGDOT                        }, [KC.R, KC.A                    ]), # ら
+    ({KC.NGSFT , KC.NGC               }, [KC.W, KC.O                    ]), # を
+    ({KC.NGSFT , KC.NGU               }, [KC.S, KC.A                    ]), # さ
+    ({KC.NGJ                          }, [KC.A                          ]), # あ
+    ({KC.NGSFT , KC.NGSLSH            }, [KC.R, KC.E                    ]), # れ
+    ({KC.NGF   , KC.NGN               }, [KC.D, KC.A                    ]), # だ
+    ({KC.NGSFT , KC.NGG               }, [KC.T, KC.I                    ]), # ち
+    ({KC.NGSFT , KC.NGA               }, [KC.S, KC.E                    ]), # せ
+    ({KC.NGS                          }, [KC.K, KC.E                    ]), # け
+    ({KC.NGSCLN                       }, [KC.MINS                       ]), # ー
+    ({KC.NGSFT , KC.NGI               }, [KC.Y, KC.O                    ]), # よ
     ({KC.NGJ   , KC.NGD               }, [KC.D, KC.O                    ]), # ど
+    ({KC.NGQ   , KC.NGP               }, [KC.X, KC.Y, KC.U              ]), # ゅ
+    ({KC.NGB                          }, [KC.S, KC.O                    ]), # そ
+    ({KC.NGSFT , KC.NGO               }, [KC.E                          ]), # え
+    ({KC.NGSFT , KC.NGDOT             }, [KC.W, KC.A                    ]), # わ
+    ({KC.NGSFT , KC.NGB               }, [KC.M, KC.I                    ]), # み
+    ({KC.NGSFT , KC.NGS               }, [KC.M, KC.E                    ]), # め
+    ({KC.NGSFT , KC.NGX               }, [KC.H, KC.I                    ]), # ひ
     ({KC.NGJ   , KC.NGC               }, [KC.B, KC.A                    ]), # ば
-    ({KC.NGJ   , KC.NGX               }, [KC.B, KC.I                    ]), # び
+    ({KC.NGSFT , KC.NGH               }, [KC.Y, KC.A                    ]), # や
+    ({KC.NGA                          }, [KC.R, KC.O                    ]), # ろ
+    ({KC.NGSFT , KC.NGZ               }, [KC.H, KC.O                    ]), # ほ
+    ({KC.NGSFT , KC.NGSCLN            }, [KC.H, KC.U                    ]), # ふ
+    ({KC.NGQ   , KC.NGH               }, [KC.X, KC.Y, KC.A              ]), # ゃ
     ({KC.NGF   , KC.NGSCLN            }, [KC.B, KC.U                    ]), # ぶ
+    ({KC.NGSFT , KC.NGR               }, [KC.N, KC.E                    ]), # ね
+    ({KC.NGJ   , KC.NGV               }, [KC.G, KC.O                    ]), # ご
+    ({KC.NGJ   , KC.NGW               }, [KC.G, KC.I                    ]), # ぎ
+    ({KC.NGJ   , KC.NGS               }, [KC.G, KC.E                    ]), # げ
+    ({KC.NGSFT , KC.NGCOMM            }, [KC.M, KC.U                    ]), # む
+    ({KC.NGF   , KC.NGO               }, [KC.Z, KC.U                    ]), # ず
+    ({KC.NGJ   , KC.NGX               }, [KC.B, KC.I                    ]), # び
+    ({KC.NGF   , KC.NGU               }, [KC.Z, KC.A                    ]), # ざ
+    ({KC.NGF   , KC.NGH               }, [KC.G, KC.U                    ]), # ぐ
+    ({KC.NGJ   , KC.NGA               }, [KC.Z, KC.E                    ]), # ぜ
+    ({KC.NGP                          }, [KC.H, KC.E                    ]), # へ
     ({KC.NGF   , KC.NGP               }, [KC.B, KC.E                    ]), # べ
+    ({KC.NGSFT , KC.NGP               }, [KC.Y, KC.U                    ]), # ゆ
     ({KC.NGJ   , KC.NGZ               }, [KC.B, KC.O                    ]), # ぼ
+    ({KC.NGV   , KC.NGSCLN            }, [KC.P, KC.U                    ]), # ぷ
+    ({KC.NGJ   , KC.NGB               }, [KC.Z, KC.O                    ]), # ぞ
+    ({KC.NGM   , KC.NGC               }, [KC.P, KC.A                    ]), # ぱ
+    ({KC.NGQ   , KC.NGK               }, [KC.X, KC.I                    ]), # ぃ
+    ({KC.NGM   , KC.NGZ               }, [KC.P, KC.O                    ]), # ぽ
+    ({KC.NGQ   , KC.NGO               }, [KC.X, KC.E                    ]), # ぇ
+    ({KC.NGF   , KC.NGL               }, [KC.D, KC.U                    ]), # づ
+    ({KC.NGM   , KC.NGX               }, [KC.P, KC.I                    ]), # ぴ
+    ({KC.NGQ   , KC.NGJ               }, [KC.X, KC.A                    ]), # ぁ
+    ({KC.NGSFT , KC.NGW               }, [KC.N, KC.U                    ]), # ぬ
+    ({KC.NGV   , KC.NGP               }, [KC.P, KC.E                    ]), # ぺ
+    ({KC.NGQ   , KC.NGN               }, [KC.X, KC.O                    ]), # ぉ
     ({KC.NGQ                          }, [KC.V, KC.U                    ]), # ゔ
     ({KC.NGSFT , KC.NGQ               }, [KC.V, KC.U                    ]), # ゔ
-
-    # 半濁音
-    ({KC.NGM   , KC.NGC               }, [KC.P, KC.A                    ]), # ぱ
-    ({KC.NGM   , KC.NGX               }, [KC.P, KC.I                    ]), # ぴ
-    ({KC.NGV   , KC.NGSCLN            }, [KC.P, KC.U                    ]), # ぷ
-    ({KC.NGV   , KC.NGP               }, [KC.P, KC.E                    ]), # ぺ
-    ({KC.NGM   , KC.NGZ               }, [KC.P, KC.O                    ]), # ぽ
-
-    # 小書き
-    ({KC.NGQ   , KC.NGH               }, [KC.X, KC.Y, KC.A              ]), # ゃ
-    ({KC.NGQ   , KC.NGP               }, [KC.X, KC.Y, KC.U              ]), # ゅ
-    ({KC.NGQ   , KC.NGI               }, [KC.X, KC.Y, KC.O              ]), # ょ
-    ({KC.NGQ   , KC.NGJ               }, [KC.X, KC.A                    ]), # ぁ
-    ({KC.NGQ   , KC.NGK               }, [KC.X, KC.I                    ]), # ぃ
+    ({KC.NGJ   , KC.NGG               }, [KC.D, KC.I                    ]), # ぢ
     ({KC.NGQ   , KC.NGL               }, [KC.X, KC.U                    ]), # ぅ
-    ({KC.NGQ   , KC.NGO               }, [KC.X, KC.E                    ]), # ぇ
-    ({KC.NGQ   , KC.NGN               }, [KC.X, KC.O                    ]), # ぉ
     ({KC.NGQ   , KC.NGDOT             }, [KC.X, KC.W, KC.A              ]), # ゎ
-    ({KC.NGG                          }, [KC.X, KC.T, KC.U              ]), # っ
     ({KC.NGQ   , KC.NGS               }, [KC.X, KC.K, KC.E              ]), # ヶ
     ({KC.NGQ   , KC.NGF               }, [KC.X, KC.K, KC.A              ]), # ヵ
 
@@ -389,6 +376,11 @@ ngdic = [
     ({KC.NGF   , KC.NGH   , KC.NGN    }, [KC.G, KC.U, KC.X, KC.O        ]), # ぐぉ
     ({KC.NGF   , KC.NGH   , KC.NGDOT  }, [KC.G, KC.U, KC.X, KC.W, KC.A  ]), # ぐゎ
     ({KC.NGV   , KC.NGL   , KC.NGJ    }, [KC.T, KC.S, KC.A              ]), # つぁ
+
+    ({KC.NGT                          }, [KC.LEFT                       ]),
+    ({KC.NGY                          }, [KC.RIGHT                      ]),
+    ({KC.NGSFT , KC.NGT               }, [KC.LSFT(KC.LEFT)              ]),
+    ({KC.NGSFT , KC.NGY               }, [KC.LSFT(KC.RIGHT)             ]),
 ]
 
 ngcomb = {

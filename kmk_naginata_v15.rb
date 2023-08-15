@@ -127,6 +127,12 @@ r_kumiawase.flatten!
 gairai.flatten!
 r_gairai.flatten!
 
+kfreq = ['い', 'う', 'ん', 'し', 'か', 'の', 'と', 'た', '、', 'て', 'く', 'な', 'に', 'き', 'は', 'こ', 'る', '。', 'が', 'で',
+         'っ', 'ょ', 'す', 'ま', 'じ', 'り', 'も', 'つ', 'お', 'ら', 'を', 'さ', 'あ', 'れ', 'だ', 'ち', 'せ', 'け', 'ー', 'よ',
+         'ど', 'ゅ', 'そ', 'え', 'わ', 'み', 'め', 'ひ', 'ば', 'や', 'ろ', 'ほ', 'ふ', 'ゃ', 'ぶ', 'ね', 'ご', 'ぎ', 'げ', 'む',
+         'ず', 'び', 'ざ', 'ぐ', 'ぜ', 'へ', 'べ', 'ゆ', 'ぼ', 'ぷ', 'ぞ', 'ぱ', 'ぃ', 'ぽ', 'ぇ', 'づ', 'ぴ', 'ぁ', 'ぬ', 'ぺ',
+         'ぉ', 'ヴ', 'ぢ', 'ぅ']
+
 def teigi(a, b, c, prefix=nil, suffix=nil)
   _a = prefix ? [sprintf("KC.NG%-4s", prefix)] : []
   _a += [a].flatten.map{|k| sprintf("KC.NG%-4s", k)}
@@ -140,15 +146,17 @@ def teigi(a, b, c, prefix=nil, suffix=nil)
   r
 end
 
+norder = {}
+
 puts "  # 清音"
 kana.each_with_index do |k, i|
   j = tanda.index(k)
   if j && j >= 0
-    puts teigi(eiji[j], r_kana[i], k)
+    norder[k] = teigi(eiji[j], r_kana[i], k)
   end
   j = shifted.index(k)
   if j && j >= 0
-    puts teigi(eiji[j], r_kana[i], k, "SFT")
+    norder[k] = teigi(eiji[j], r_kana[i], k, "SFT")
   end
 end
 
@@ -158,10 +166,10 @@ daku.each_with_index do |k, i|
   j = tanda.index(t_daku[i]) || shifted.index(t_daku[i])
   if j && j >= 0
     if eiji_r.index(eiji[j])
-      puts teigi(eiji[j], r_daku[i], k, "F")
+      norder[k] = teigi(eiji[j], r_daku[i], k, "F")
       # puts teigi(eiji[j], r_daku[i], k + "(冗長)", "B_F|", "|B_SHFT")
     else
-      puts teigi(eiji[j], r_daku[i], k, "J")
+      norder[k] = teigi(eiji[j], r_daku[i], k, "J")
       # puts teigi(eiji[j], r_daku[i], k + "(冗長)", "B_J|", "|B_SHFT")
     end
   end
@@ -173,10 +181,10 @@ handaku.each_with_index do |k, i|
   j = tanda.index(t_handaku[i]) || shifted.index(t_handaku[i])
   if j && j >= 0
     if eiji_r.index(eiji[j])
-      puts teigi(eiji[j], r_handaku[i], k, "V")
+      norder[k] = teigi(eiji[j], r_handaku[i], k, "V")
       # puts teigi(eiji[j], r_handaku[i], k + "(冗長)", "B_V|", "|B_SHFT")
     else
-      puts teigi(eiji[j], r_handaku[i], k, "M")
+      norder[k] = teigi(eiji[j], r_handaku[i], k, "M")
       # puts teigi(eiji[j], r_handaku[i], k + "(冗長)", "B_M|", "|B_SHFT")
     end
   end
@@ -187,23 +195,34 @@ puts "  # 小書き"
 kogaki.each_with_index do |k, i|
   j = tanda.index(k)
   if j && j >= 0
-    puts teigi(eiji[j], r_kogaki[i], k)
+    norder[k] = teigi(eiji[j], r_kogaki[i], k)
     next
   end
   j = shifted.index(k)
   if j && j >= 0
-    puts teigi(eiji[j], r_kogaki[i], k, "SFT")
+    norder[k] = teigi(eiji[j], r_kogaki[i], k, "SFT")
     next
   end
 
   j = tanda.index(t_kogaki[i]) || shifted.index(t_kogaki[i])
   if j && j >= 0
-    puts teigi(eiji[j], r_kogaki[i], k, "Q")
+    norder[k] = teigi(eiji[j], r_kogaki[i], k, "Q")
     # puts teigi(eiji[j], r_kogaki[i], k, "B_Q|B_SHFT|")
     # puts teigi(eiji[j], r_kogaki[i], k, "B_V|B_M|")
     # puts teigi(eiji[j], r_kogaki[i], k + "(冗長)", "B_V|B_M|", "|B_SHFT")
   end
 end
+
+kfreq.each do |k|
+  if norder.key? k
+    puts norder[k]
+  else
+    puts "未定義 #{k}"
+  end
+end
+
+puts "足りない"
+puts norder.keys - kfreq
 
 puts
 puts "  # 清音拗音 濁音拗音 半濁拗音"
