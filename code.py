@@ -69,12 +69,17 @@ def ng_press(*args, **kwargs):
     kc = args[0]
     pressed_keys += 1
 
+    # オーバーフロー
     if pressed_keys > max_keys or len(nginput) >= max_keys:
         s = ng_type(True)
         t = False
-        for ka in nginput:
+        # 連続シフトの引き継ぎ
+        for ka in nginput[0:s]:
             if ka.is_shift and ka.release_at == 0:
-                ka.press_at = now
+                if s < len(nginput):
+                    ka.press_at = nginput[s].press_at
+                else:
+                    ka.press_at = now
                 t = ka
                 break
         del nginput[0:s]
@@ -112,7 +117,8 @@ def ng_type(partial = False):
 
     # キーの組合せから、辞書にあるものだけを抜き出す
     lllka = [] # list(list(list(KeyAction)))
-    for lindex in ngcomb[len(nginput)]: # list(list(num))
+    l = min([len(nginput), 5]) # ガード
+    for lindex in ngcomb[l]: # list(list(num))
         llka = [] # list(list(KeyAction))
         is_exist = True
         for cindex in lindex: # list(num)
@@ -140,14 +146,17 @@ def ng_type(partial = False):
             best_score = s
 
     if partial:
-        bc = [best_comb[0]] # 最初の組合せだけ変換する
+        bc = best_comb[0:1] # 最初の組合せだけ変換する
     else:
         bc = best_comb
 
     # かなに変換する
-    keyseq = []    
+    keyseq = []
+    ks = set() # 削除するキーセット
     for k in bc:
         s = set(map(lambda x: x.keycode_s(), k))
+        for ka in k:
+            ks.add(ka)
         for l in ngdic:
             if l[0] == s:
                 keyseq += l[1]
@@ -157,7 +166,7 @@ def ng_type(partial = False):
     keyboard.tap_key(kcs)
 
     # 何キー処理したが返す
-    return sum(map(lambda x: len(x), bc))
+    return len(ks)
 
 def scoring(comb): #list(list(KeyAction))
     score = 0
