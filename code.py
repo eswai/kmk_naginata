@@ -3,7 +3,7 @@
 print("Starting")
 
 import board
-import time
+import supervisor
 
 from kmk.kmk_keyboard import KMKKeyboard
 from kmk.keys import KC
@@ -72,14 +72,14 @@ def ng_press(*args, **kwargs):
         t = False
         for ka in nginput:
             if ka.is_shift and ka.release_at == 0:
-                ka.press_at = time.monotonic()
+                ka.press_at = supervisor.ticks_ms()
                 t = ka
                 break
         del nginput[0:s]
         if t:
             nginput.insert(0, t)
 
-    nginput.append(KeyAction(kc, time.monotonic(), 0))
+    nginput.append(KeyAction(kc, supervisor.ticks_ms(), 0))
     return False
 
 def ng_release(*args, **kwargs):
@@ -91,7 +91,7 @@ def ng_release(*args, **kwargs):
     # リリース時間保存
     for ka in nginput:
         if ka.keycode == kc and ka.release_at == 0:
-            ka.release_at = time.monotonic()
+            ka.release_at = supervisor.ticks_ms()
             break
 
     # かな変換
@@ -155,7 +155,7 @@ def ng_type(partial = False):
 
 def scoring(comb): #list(list(KeyAction))
     score = 0
-    now = time.monotonic()
+    now = supervisor.ticks_ms()
     for lka in comb: # list(KeyAction)
         if len(lka) == 1:
             score = 100
