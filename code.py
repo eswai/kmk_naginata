@@ -16,6 +16,7 @@ from kmk.modules.combos import Combos, Chord, Sequence
 from kmk.modules.holdtap import HoldTap
 
 keyboard = KMKKeyboard()
+keyboard.debug_enabled = True
 
 keyboard.col_pins = (board.GP15, board.GP14, board.GP13, board.GP12, board.GP11, board.GP20, board.GP19, board.GP18, board.GP17, board.GP16,)
 keyboard.row_pins = (board.GP7, board.GP8, board.GP9, board.GP10,)
@@ -33,8 +34,6 @@ keyboard.modules.append(layers)
 layers.combo_layers = {
     (2, 3): 4,
 }
-
-keyboard.debug_enabled = True
 
 LOWER = KC.MO(2)
 RAISE = KC.MO(3)
@@ -60,10 +59,7 @@ class KeyAction:
         return self.release_at if self.release_at > 0 else t
 
     def is_shift(self):
-        if self.keycode in shift_keys:
-            return True
-        else:
-            return False
+        return self.keycode in shift_keys
 
 #　かな変換の処理
 def ng_press(*args, **kwargs):
@@ -109,6 +105,7 @@ def ng_type(partial = False):
 
     if len(nginput) == 1 and nginput[0].keycode == KC.NGSFT2:
         keyboard.tap_key(KC.ENT)
+        return 1
 
     lllka = [] # list(list(list(KeyAction)))
     for lindex in ngcomb[len(nginput)]: # list(list(num))
