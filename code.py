@@ -113,7 +113,7 @@ def ng_type(partial = False):
     lllka = [] # list(list(list(KeyAction)))
     for lindex in ngcomb[len(nginput)]: # list(list(num))
         llka = [] # list(list(KeyAction))
-        is_exist = False
+        is_exist = True
         for cindex in lindex: # list(num)
             lka = [] # list(KeyAction)
             llka.append(lka)
@@ -122,8 +122,9 @@ def ng_type(partial = False):
             skc = set(map(lambda x: x.keycode_s(), lka))
             for k in ngdic: # (set(KC), list(KC))
                 if k[0] == skc:
-                    is_exist = True
                     break
+            else:
+                is_exist = False
             if not is_exist:
                 break
         if is_exist:
@@ -160,7 +161,7 @@ def scoring(comb): #list(list(KeyAction))
     score = 0
     for lka in comb: # list(KeyAction)
         if len(lka) == 1:
-            score = 100
+            score += 100
         else:
             latest_press = max(map(lambda x: x.press_at, lka))
             earliest_release = min(map(lambda x: x.release_at_t(now), lka))
