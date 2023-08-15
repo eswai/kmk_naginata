@@ -16,7 +16,7 @@ from kmk.modules.combos import Combos, Chord, Sequence
 from kmk.modules.holdtap import HoldTap
 
 keyboard = KMKKeyboard()
-keyboard.debug_enabled = True
+# keyboard.debug_enabled = True
 
 keyboard.col_pins = (board.GP15, board.GP14, board.GP13, board.GP12, board.GP11, board.GP20, board.GP19, board.GP18, board.GP17, board.GP16,)
 keyboard.row_pins = (board.GP7, board.GP8, board.GP9, board.GP10,)
@@ -45,6 +45,7 @@ pressed_keys = 0
 nginput = []
 max_keys = 5
 shift_keys = [KC.NGSFT, KC.NGSFT2, KC.NGF, KC.NGV, KC.NGJ, KC.NGM]
+now = 0
 
 class KeyAction:
     def __init__(self, keycode, press_at, release_at):
@@ -63,7 +64,8 @@ class KeyAction:
 
 #　かな変換の処理
 def ng_press(*args, **kwargs):
-    global pressed_keys
+    global pressed_keys, now
+    now = supervisor.ticks_ms()
     kc = args[0]
     pressed_keys += 1
 
@@ -72,18 +74,19 @@ def ng_press(*args, **kwargs):
         t = False
         for ka in nginput:
             if ka.is_shift and ka.release_at == 0:
-                ka.press_at = supervisor.ticks_ms()
+                ka.press_at = now
                 t = ka
                 break
         del nginput[0:s]
         if t:
             nginput.insert(0, t)
 
-    nginput.append(KeyAction(kc, supervisor.ticks_ms(), 0))
+    nginput.append(KeyAction(kc, now, 0))
     return False
 
 def ng_release(*args, **kwargs):
-    global pressed_keys
+    global pressed_keys, now
+    now = supervisor.ticks_ms()
     kc = args[0]
     if pressed_keys > 0:
         pressed_keys -= 1
@@ -91,7 +94,7 @@ def ng_release(*args, **kwargs):
     # リリース時間保存
     for ka in nginput:
         if ka.keycode == kc and ka.release_at == 0:
-            ka.release_at = supervisor.ticks_ms()
+            ka.release_at = now
             break
 
     # かな変換
@@ -155,7 +158,6 @@ def ng_type(partial = False):
 
 def scoring(comb): #list(list(KeyAction))
     score = 0
-    now = supervisor.ticks_ms()
     for lka in comb: # list(KeyAction)
         if len(lka) == 1:
             score = 100
