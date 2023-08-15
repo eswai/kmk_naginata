@@ -51,6 +51,9 @@ class KeyAction:
         self.press_at = press_at
         self.release_at = release_at
     
+    def keycode_s(self):
+        return self.keycode if self.keycode != KC.NGSFT2 else KC.NGSFT
+    
     def release_at_t(self, t):
         return self.release_at if self.release_at > 0 else t
 
@@ -76,13 +79,17 @@ def ng_release(*args, **kwargs):
 
     # かな変換
     if pressed_keys == 0 and len(nginput) > 0:
-        s = simple_key_sequence(ngtype())
+        s = simple_key_sequence(ng_type())
         keyboard.tap_key(s)
         nginput.clear()
 
     return False
 
-def ngtype():
+def ng_type():
+
+    if len(nginput) == 1 and nginput[0].keycode == KC.NGSFT2:
+        return [KC.ENT]
+
     lllka = [] # list(list(list(KeyAction)))
     for lindex in ngcomb[len(nginput)]: # list(list(num))
         llka = [] # list(list(KeyAction))
@@ -92,7 +99,7 @@ def ngtype():
             llka.append(lka)
             for i in cindex: # num
                 lka.append(nginput[i])
-            skc = set(map(lambda x: x.keycode, lka))
+            skc = set(map(lambda x: x.keycode_s(), lka))
             for k in ngdic: # (set(KC), list(KC))
                 if k[0] == skc:
                     is_exist = True
@@ -111,7 +118,7 @@ def ngtype():
 
     keyseq = []
     for k in best_comb:
-        s = set(map(lambda x: x.keycode, k))
+        s = set(map(lambda x: x.keycode_s(), k))
         for l in ngdic:
             if l[0] == s:
                 keyseq += l[1]
@@ -154,7 +161,7 @@ ngkeys = [
     'NGQ', 'NGW', 'NGE', 'NGR', 'NGT', 'NGY', 'NGU', 'NGI', 'NGO', 'NGP', 
     'NGA', 'NGS', 'NGD', 'NGF', 'NGG', 'NGH', 'NGJ', 'NGK', 'NGL', 'NGSCLN',
     'NGZ', 'NGX', 'NGC', 'NGV', 'NGB', 'NGN', 'NGM', 'NGCOMM', 'NGDOT', 'NGSLSH',
-    'NGSFT'
+    'NGSFT', 'NGSFT2'
 ]
 for k in ngkeys:
     make_key(names=(k,), on_press = ng_press, on_release = ng_release)
@@ -455,7 +462,7 @@ keyboard.keymap = [
         KC.NGQ   ,KC.NGW   ,KC.NGE   ,KC.NGR   ,KC.NGT   ,KC.NGY   ,KC.NGU   ,KC.NGI   ,KC.NGO   ,KC.NGP   ,
         KC.NGA   ,KC.NGS   ,KC.NGD   ,KC.NGF   ,KC.NGG   ,KC.NGH   ,KC.NGJ   ,KC.NGK   ,KC.NGL   ,KC.NGSCLN,
         KC.NGZ   ,KC.NGX   ,KC.NGC   ,KC.NGV   ,KC.NGB   ,KC.NGN   ,KC.NGM   ,KC.NGCOMM,KC.NGDOT ,KC.NGSLSH,
-        KC.LCTL  ,KC.LSFT  ,KC.LGUI  ,LOWER    ,KC.NGSFT ,KC.NGSFT ,RAISE    ,KC.RCTRL ,KC.NGON  ,KC.NGOFF ,
+        KC.LCTL  ,KC.LSFT  ,KC.LGUI  ,LOWER    ,KC.NGSFT ,KC.NGSFT2,RAISE    ,KC.RCTRL ,KC.NGON  ,KC.NGOFF ,
     ],
     [
     #  |---------+---------+---------+---------+---------+---------+---------+---------+---------+---------|
