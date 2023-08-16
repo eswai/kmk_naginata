@@ -41,8 +41,10 @@ SSPC = KC.HT(KC.SPC, KC.LSFT)
 SENT = KC.HT(KC.ENTER, KC.LSFT)
 NGTG = KC.TG(1)
 
-pressed_keys = 0
-nginput = []
+kouchi_shift = False # 後置シフトを許す
+
+pressed_keys = 0 # 同時に押しているキーの数
+nginput = [] # 未変換のキー KeyActionの配列
 max_keys = 4 # 5キーの組み合わせは遅すぎる。4キーでもオーバーフロー処理をすれば正しく変換できてる。
 shift_keys = [KC.NGSFT, KC.NGSFT2, KC.NGF, KC.NGV, KC.NGJ, KC.NGM]
 now = 0
@@ -61,6 +63,9 @@ class KeyAction:
 
     def is_shift(self):
         return self.keycode in shift_keys
+
+    def is_pure_shift(self):
+        return self.keycode in [KC.NGSFT, KC.NGSFT2]
 
 #　かな変換の処理
 def ng_press(*args, **kwargs):
@@ -120,11 +125,14 @@ def ng_type(partial = False):
     l = min([len(nginput), max_keys]) # ガード
     for lindex in ngcomb[l]: # list(list(num))
         llka = [] # list(list(KeyAction))
-        is_exist = True
+        is_exist = True # 辞書にある組み合わせかどうか
+        inc_ks = False # 後置シフトを含むかどうか
         for cindex in lindex: # list(num)
             lka = [] # list(KeyAction)
-            for i in cindex: # num
-                lka.append(nginput[i])
+            for i, ci in enumerate(cindex): # num
+                if i > 0 and nginput[ci].is_pure_shift():
+                    inc_ks = True
+                lka.append(nginput[ci])
             skc = set(map(lambda x: x.keycode_s(), lka))
             for k in ngdic: # (set(KC), list(KC))
                 if k[0] == skc:
@@ -134,7 +142,11 @@ def ng_type(partial = False):
                 break
             llka.append(lka)
         if is_exist:
-            lllka.append(llka)
+            if kouchi_shift:
+                lllka.append(llka)
+            else:
+                if not inc_ks:
+                    lllka.append(llka)
     
     # 組み合わせの点数づけをして、点数の高い組合せを選ぶ
     best_score = 0
