@@ -68,8 +68,8 @@ shifted.delete_at(22)
 shifted.delete_at(11)
 shifted.delete_at(10)
 
-kana      = %w(あ い う え お か き く け こ さ し す せ そ た ち つ て と な に ぬ ね の は ひ ふ へ ほ ま み む め も や ゆ よ ら り る れ ろ わ を ん ー)
-r_kana    = %w(a i u e o ka ki ku ke ko sa si su se so ta ti tu te to na ni nu ne no ha hi hu he ho ma mi mu me mo ya yu yo ra ri ru re ro wa wo nn -)
+kana      = %w(あ い う え お か き く け こ さ し す せ そ た ち つ て と な に ぬ ね の は ひ ふ へ ほ ま み む め も や ゆ よ ら り る れ ろ わ を ん ー 、{Enter} 。{Enter} ゔ)
+r_kana    = %w(a i u e o ka ki ku ke ko sa si su se so ta ti tu te to na ni nu ne no ha hi hu he ho ma mi mu me mo ya yu yo ra ri ru re ro wa wo nn - , . vu)
 
 daku      = %w(が ぎ ぐ げ ご ざ じ ず ぜ ぞ だ ぢ づ で ど ば び ぶ べ ぼ ゔ)
 r_daku    = %w(ga gi gu ge go za zi zu ze zo da di du de do ba bi bu be bo vu)
@@ -127,7 +127,7 @@ r_kumiawase.flatten!
 gairai.flatten!
 r_gairai.flatten!
 
-kfreq = ['い', 'う', 'ん', 'か', 'の', 'と', 'し', 'た', '、', 'く', 'な', 'て', 'に', 'は', 'こ', 'る', '。', 'が', 'で', 'っ', 'す', 'き', 'ま', 'も', 'つ', 'お', 'ら', 'を', 'さ', 'あ', 'り', 'れ', 'だ', 'せ', 'け', 'じ', 'ー', 'よ', 'ど', 'そ', 'え', 'わ', 'ち', 'み', 'め', 'ば', 'や', 'ひ', 'ろ', 'ほ', 'しょ', 'ぶ', 'ふ', 'ね', 'ご', 'じょ', 'げ', 'しゅ', 'む', 'きょ', 'ず', 'ぎ', 'しゃ', 'ちょ', 'び', 'ざ', 'ぐ', 'ぜ', 'へ', 'べ', 'ゆ', 'じゅ', 'ぼ', 'ぷ', 'りょ', 'ぞ', 'ぱ', 'きゅ', 'ちゅ', 'ぎょ', 'ぽ', 'にゅ', 'ひょ', 'づ', 'じゃ', 'ちゃ', 'ぬ', 'てぃ', 'ぴ', 'りゅ', 'ぺ', 'きゃ', 'ふぁ', 'でぃ', 'ぁ', 'しぇ', 'びょ', 'りゃ', 'ふぃ', 'ちぇ', 'ぎゃ', 'うぇ', 'なぁ', 'ぃ', 'ふぇ', 'ぴょ', 'ぴゅ', 'じぇ', 'ふぉ', 'ぇ', 'ゔ', 'びゅ', 'ぢ', 'みょ', 'ひゃ', 'みゅ', 'ぎゅ', 'ぉ', 'みぃ', 'ゔぁ', 'うぃ', 'にょ', 'ねぇ', 'ぅ', 'まぁ', 'ゅ', 'ねぃ', 'でゅ', 'みゃ', 'にゃ', 'うぉ', 'かぁ', 'とぅ', 'くぉ', 'ひゅ', 'りぃ', 'はぁ', 'へぇ', 'だぁ', 'ぎぃ', 'どぅ', 'しぃ', 'ゔぃ', 'おぉ', 'ゔぇ', 'てぇ', 'やぁ', 'ぴゃ', 'びゃ', 'あぁ', 'つぁ', 'もぉ', 'ゃぁ', 'つぃ', 'ふゅ', 'ぅぃ', 'さぁ', 'よぉ', 'ぬぁ', 'げぇ', 'ぁぁ', 'たぁ', 'わぁ', 'らぁ', 'にぇ', 'ぉぉ', 'ぉぃ', 'ょ', 'ぃぃ', 'つぇ', 'にぃ', 'ぅぅ', 'ふぅ', 'るぅ', 'えぇ', 'じぃ', 'ぜぃ', 'びぃ', 'べぇ', 'とぉ', 'つぉ', 'ぞぉ', 'ゃ', 'るぁ', 'きぃ', 'ちぃ', 'すぃ', 'ぬぃ', 'いぃ', 'うぅ', 'よぅ', 'むぅ', 'ぐぅ', 'くぅ', 'っぅ', 'のぅ', 'ぜぇ', 'でぇ', 'やぇ', 'けぇ', 'ひぇ', 'せぇ', 'きぇ', 'さぇ', 'まぇ', 'ゔぉ', 'ぢゃ', 'ゎ', ]
+$kfreq = ['い', 'う', 'ん', 'か', 'の', 'と', 'し', 'た', '、', 'く', 'な', 'て', 'に', 'は', 'こ', 'る', '。', 'が', 'で', 'っ', 'す', 'き', 'ま', 'も', 'つ', 'お', 'ら', 'を', 'さ', 'あ', 'り', 'れ', 'だ', 'せ', 'け', 'じ', 'ー', 'よ', 'ど', 'そ', 'え', 'わ', 'ち', 'み', 'め', 'ば', 'や', 'ひ', 'ろ', 'ほ', 'しょ', 'ぶ', 'ふ', 'ね', 'ご', 'じょ', 'げ', 'しゅ', 'む', 'きょ', 'ず', 'ぎ', 'しゃ', 'ちょ', 'び', 'ざ', 'ぐ', 'ぜ', 'へ', 'べ', 'ゆ', 'じゅ', 'ぼ', 'ぷ', 'りょ', 'ぞ', 'ぱ', 'きゅ', 'ちゅ', 'ぎょ', 'ぽ', 'にゅ', 'ひょ', 'づ', 'じゃ', 'ちゃ', 'ぬ', 'てぃ', 'ぴ', 'りゅ', 'ぺ', 'きゃ', 'ふぁ', 'でぃ', 'ぁ', 'しぇ', 'びょ', 'りゃ', 'ふぃ', 'ちぇ', 'ぎゃ', 'うぇ', 'なぁ', 'ぃ', 'ふぇ', 'ぴょ', 'ぴゅ', 'じぇ', 'ふぉ', 'ぇ', 'ゔ', 'びゅ', 'ぢ', 'みょ', 'ひゃ', 'みゅ', 'ぎゅ', 'ぉ', 'みぃ', 'ゔぁ', 'うぃ', 'にょ', 'ねぇ', 'ぅ', 'まぁ', 'ゅ', 'ねぃ', 'でゅ', 'みゃ', 'にゃ', 'うぉ', 'かぁ', 'とぅ', 'くぉ', 'ひゅ', 'りぃ', 'はぁ', 'へぇ', 'だぁ', 'ぎぃ', 'どぅ', 'しぃ', 'ゔぃ', 'おぉ', 'ゔぇ', 'てぇ', 'やぁ', 'ぴゃ', 'びゃ', 'あぁ', 'つぁ', 'もぉ', 'ゃぁ', 'つぃ', 'ふゅ', 'ぅぃ', 'さぁ', 'よぉ', 'ぬぁ', 'げぇ', 'ぁぁ', 'たぁ', 'わぁ', 'らぁ', 'にぇ', 'ぉぉ', 'ぉぃ', 'ょ', 'ぃぃ', 'つぇ', 'にぃ', 'ぅぅ', 'ふぅ', 'るぅ', 'えぇ', 'じぃ', 'ぜぃ', 'びぃ', 'べぇ', 'とぉ', 'つぉ', 'ぞぉ', 'ゃ', 'るぁ', 'きぃ', 'ちぃ', 'すぃ', 'ぬぃ', 'いぃ', 'うぅ', 'よぅ', 'むぅ', 'ぐぅ', 'くぅ', 'っぅ', 'のぅ', 'ぜぇ', 'でぇ', 'やぇ', 'けぇ', 'ひぇ', 'せぇ', 'きぇ', 'さぇ', 'まぇ', 'ゔぉ', 'ぢゃ', 'ゎ', ]
 
 def teigi(a, b, c, prefix=nil, suffix=nil)
   _a = prefix ? [sprintf("KC.NG%-4s", prefix)] : []
@@ -137,22 +137,22 @@ def teigi(a, b, c, prefix=nil, suffix=nil)
   for i in 0..(b.length - 1)
     _b.push sprintf("KC.%-1s", b[i].upcase)
   end
-  r = sprintf("  ({%-32s}", _a.join(", "))
-  r+= sprintf(", [%-30s]", _b.join(", ")) + "), # #{c}"
+  r = sprintf("    ({ %-31s}", _a.join(", "))
+  r+= sprintf(", [ %-29s]", _b.join(", ")) + "), # #{c}"
   r
 end
 
-norder = {}
+norder = []
 
 puts "  # 清音"
 kana.each_with_index do |k, i|
   j = tanda.index(k)
   if j && j >= 0
-    norder[k] = teigi(eiji[j], r_kana[i], k)
+    norder << [k, teigi(eiji[j], r_kana[i], k)]
   end
   j = shifted.index(k)
   if j && j >= 0
-    norder[k] = teigi(eiji[j], r_kana[i], k, "SFT")
+    norder << [k, teigi(eiji[j], r_kana[i], k, "SFT")]
   end
 end
 
@@ -162,10 +162,10 @@ daku.each_with_index do |k, i|
   j = tanda.index(t_daku[i]) || shifted.index(t_daku[i])
   if j && j >= 0
     if eiji_r.index(eiji[j])
-      norder[k] = teigi(eiji[j], r_daku[i], k, "F")
+      norder << [k, teigi(eiji[j], r_daku[i], k, "F")]
       # puts teigi(eiji[j], r_daku[i], k + "(冗長)", "B_F|", "|B_SHFT")
     else
-      norder[k] = teigi(eiji[j], r_daku[i], k, "J")
+      norder << [k, teigi(eiji[j], r_daku[i], k, "J")]
       # puts teigi(eiji[j], r_daku[i], k + "(冗長)", "B_J|", "|B_SHFT")
     end
   end
@@ -177,10 +177,10 @@ handaku.each_with_index do |k, i|
   j = tanda.index(t_handaku[i]) || shifted.index(t_handaku[i])
   if j && j >= 0
     if eiji_r.index(eiji[j])
-      norder[k] = teigi(eiji[j], r_handaku[i], k, "V")
+      norder << [k, teigi(eiji[j], r_handaku[i], k, "V")]
       # puts teigi(eiji[j], r_handaku[i], k + "(冗長)", "B_V|", "|B_SHFT")
     else
-      norder[k] = teigi(eiji[j], r_handaku[i], k, "M")
+      norder << [k, teigi(eiji[j], r_handaku[i], k, "M")]
       # puts teigi(eiji[j], r_handaku[i], k + "(冗長)", "B_M|", "|B_SHFT")
     end
   end
@@ -191,18 +191,18 @@ puts "  # 小書き"
 kogaki.each_with_index do |k, i|
   j = tanda.index(k)
   if j && j >= 0
-    norder[k] = teigi(eiji[j], r_kogaki[i], k)
+    norder << [k, teigi(eiji[j], r_kogaki[i], k)]
     next
   end
   j = shifted.index(k)
   if j && j >= 0
-    norder[k] = teigi(eiji[j], r_kogaki[i], k, "SFT")
+    norder << [k, teigi(eiji[j], r_kogaki[i], k, "SFT")]
     next
   end
 
   j = tanda.index(t_kogaki[i]) || shifted.index(t_kogaki[i])
   if j && j >= 0
-    norder[k] = teigi(eiji[j], r_kogaki[i], k, "Q")
+    norder << [k, teigi(eiji[j], r_kogaki[i], k, "Q")]
     # puts teigi(eiji[j], r_kogaki[i], k, "B_Q|B_SHFT|")
     # puts teigi(eiji[j], r_kogaki[i], k, "B_V|B_M|")
     # puts teigi(eiji[j], r_kogaki[i], k + "(冗長)", "B_V|B_M|", "|B_SHFT")
@@ -253,7 +253,7 @@ kumiawase.each_with_index do |k, i|
   j = tanda.index(t_kogaki[l]) || shifted.index(t_kogaki[l])
   if j && j >= 0
     e1 = eiji[j]
-    norder[k] = teigi([e0, e1], r_kumiawase[i], k)
+    norder << [k, teigi([e0, e1], r_kumiawase[i], k)]
     # puts teigi([e0, e1], r_kumiawase[i], k + "(冗長)", "", "|B_SHFT")
   end
 end
@@ -287,22 +287,19 @@ gairai.each_with_index do |k, i|
   j = tanda.index(t_kogaki[l]) || shifted.index(t_kogaki[l])
   if j && j >= 0
     e1 = eiji[j]
-    norder[k] = teigi([e0, e1], r_gairai[i], k)
+    norder << [k, teigi([e0, e1], r_gairai[i], k)]
     # puts teigi([e0, e1], r_gairai[i], k + "(冗長)", "", "|B_SHFT")
   end
 end
 
-kfreq.each do |k|
-  if norder.key? k
-    puts norder[k]
-  else
-    puts "未定義 #{k}"
-  end
+def kindex(a)
+  b = a.gsub('{Enter}', '')
+  o = $kfreq.index(b) || 1000
 end
 
-puts "足りない"
-puts norder.keys - kfreq
+norder.sort!{|a, b| kindex(a[0]) <=> kindex(b[0])}
 
+puts norder.map{|x| x[1]}
 
 # 編集モード
 
