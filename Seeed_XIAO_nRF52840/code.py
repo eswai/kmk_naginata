@@ -1,23 +1,30 @@
-# Vpico KMK薙刀式
+# KMK薙刀式
 
 print("Starting")
 
 import board
+import gc
 
+from kmk.hid import HIDModes
 from kmk.kmk_keyboard import KMKKeyboard
 from kmk.keys import KC
 from kmk.scanners import DiodeOrientation
 from kmk.modules.layers import Layers
-from kmk.modules.combos import Combos, Chord, Sequence
+from kmk.modules.combos import Combos, Chord
 from kmk.modules.holdtap import HoldTap
 from naginata import initNaginata
+from kmk.modules.split import Split, SplitType, SplitSide
 
 keyboard = KMKKeyboard()
-keyboard.debug_enabled = False
+keyboard.debug_enabled = True
 
-keyboard.col_pins = (board.GP15, board.GP14, board.GP13, board.GP12, board.GP11, board.GP20, board.GP19, board.GP18, board.GP17, board.GP16,)
-keyboard.row_pins = (board.GP7, board.GP8, board.GP9, board.GP10,)
+keyboard.col_pins = (board.D10, board.D7, board.D4, board.D5, board.D1,)
+keyboard.row_pins = (board.D2, board.D3, board.D0, board.D9,)
 keyboard.diode_orientation = DiodeOrientation.COL2ROW
+
+split = Split(split_type=SplitType.BLE, split_side=SplitSide.LEFT)
+# split = Split(split_type=SplitType.BLE, split_side=SplitSide.RIGHT)
+keyboard.modules.append(split)
 
 combos = Combos()
 keyboard.modules.append(combos)
@@ -45,6 +52,8 @@ combos.combos = [
     Chord((KC.NGF, KC.NGG), KC.NGOFF, timeout = 100, per_key_timeout = False, fast_reset = True),
 ]
 
+gc.collect()
+
 keyboard.keymap = [
     [
     #  |---------+---------+---------+---------+---------+---------+---------+---------+---------+---------|
@@ -55,7 +64,7 @@ keyboard.keymap = [
     ],
     [
     #  |---------+---------+---------+---------+---------+---------+---------+---------+---------+---------|
-        KC.NGQ   ,KC.NGW   ,KC.NGE   ,KC.NGR   ,KC.NGT   ,KC.NGY   ,KC.NGU   ,KC.NGI   ,KC.NGO   ,KC.NGP   ,
+        KC.NGQ   ,KC.NGW   ,KC.NGE   ,KC.NGR   ,KC.NGT   ,KC.NGY   ,KC.NGU   ,KC.NGI   ,KC.NGO   ,KC.NP0_  ,
         KC.NGA   ,KC.NGS   ,KC.NGD   ,KC.NGF   ,KC.NGG   ,KC.NGH   ,KC.NGJ   ,KC.NGK   ,KC.NGL   ,KC.NGSCLN,
         KC.NGZ   ,KC.NGX   ,KC.NGC   ,KC.NGV   ,KC.NGB   ,KC.NGN   ,KC.NGM   ,KC.NGCOMM,KC.NGDOT ,KC.NGSLSH,
         KC.LCTL  ,KC.LSFT  ,KC.LGUI  ,LOWER    ,KC.NGSFT ,KC.NGSFT2,RAISE    ,KC.RCTRL ,KC.NGON  ,KC.NGOFF ,
@@ -84,4 +93,4 @@ keyboard.keymap = [
 ]
 
 if __name__ == '__main__':
-    keyboard.go()
+    keyboard.go(hid_type=HIDModes.BLE, ble_name='MABLE')

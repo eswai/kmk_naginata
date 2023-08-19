@@ -4,6 +4,7 @@ from kmk.keys import KC
 from kmk.keys import make_key
 from kmk.handlers.sequences import send_string
 from kmk.handlers.sequences import simple_key_sequence
+from kmk.handlers.sequences import unicode_string_sequence
 
 kouchi_shift = True # 後置シフトを許す
 
@@ -15,6 +16,7 @@ now = 0
 ng_layer = 0
 kblayers = None
 kb = None
+henshu_mode = 0
 
 class KeyAction:
     def __init__(self, keycode, press_at, release_at):
@@ -39,6 +41,19 @@ def initNaginata(_kb, _layers, _ng_layer):
     kb = _kb
     kblayers = _layers
     ng_layer = _ng_layer
+
+def ng_henshu(*args, **kwargs):
+    kc = args[0]
+    if henshu_mode == 0:
+        return True
+    elif henshu_mode == 1:
+        hk = nghenshu1dic[kc]
+        if hk:
+            kb.tap_key(simple_key_sequence(hk))
+        return False
+    elif henshu_mode == 2:
+        kb.tap_key(KC.N2)
+        return False
 
 #　かな変換の処理
 def ng_press(*args, **kwargs):
@@ -88,6 +103,7 @@ def ng_release(*args, **kwargs):
     return False
 
 def ng_type(partial = False):
+    tstart = supervisor.ticks_ms()
     # partial nginputの全部を出力するか、最初だけ出力するか
     if len(nginput) == 1 and nginput[0].keycode == KC.NGSFT2:
         kb.tap_key(KC.ENT)
@@ -121,6 +137,8 @@ def ng_type(partial = False):
                 if not inc_ks:
                     lllka.append(llka)
     
+    print('ng_type 1 %d ms' % (supervisor.ticks_ms() - tstart))
+
     # 組み合わせの点数づけをして、点数の高い組合せを選ぶ
     best_score = 0
     best_comb = [] # list(list(KeyAction))
@@ -149,6 +167,8 @@ def ng_type(partial = False):
 
     kcs = simple_key_sequence(keyseq)
     kb.tap_key(kcs)
+
+    print('ng_type %d-keys took %d ms' % (len(nginput), supervisor.ticks_ms() - tstart))
 
     # 何キー処理したが返す
     return len(ks)
@@ -181,6 +201,21 @@ def naginata_off(*args, **kwargs):
     kb.tap_key(KC.INT5)
     return False
 
+def ng_henshu1_on(*args, **kwargs):
+    global henshu_mode
+    henshu_mode = 1
+    return False
+
+def ng_henshu2_on(*args, **kwargs):
+    global henshu_mode
+    henshu_mode = 2
+    return False
+
+def ng_henshu_off(*args, **kwargs):
+    global henshu_mode
+    henshu_mode = 0
+    return False
+
 # キーの定義
 ngkeys = [
     'NGQ', 'NGW', 'NGE', 'NGR', 'NGT', 'NGY', 'NGU', 'NGI', 'NGO', 'NGP', 
@@ -193,6 +228,11 @@ for k in ngkeys:
 
 make_key(names=('NGON' ,), on_release = naginata_on) # on_releaseの方が安定する
 make_key(names=('NGOFF',), on_release = naginata_off)
+make_key(names=('NGH1', ), on_press = ng_henshu1_on, on_release = ng_henshu_off)
+make_key(names=('NGH2', ), on_press = ng_henshu2_on, on_release = ng_henshu_off)
+
+KC.A.before_press_handler(ng_henshu)
+KC.NGA.before_press_handler(ng_henshu)
 
 # かな変換テーブル setはdictionaryのキーにできないので配列に
 ngdic = [
@@ -370,6 +410,13 @@ ngdic = [
     ({ KC.NGSFT , KC.NGY              }, [ KC.LSFT(KC.RIGHT)            ]), # 操作感悪い
 ]
 
+nghenshu1dic = {
+    KC.S     : [unicode_string_sequence('()'), KC.LEFT],
+    KC.NGS   : [unicode_string_sequence('（）'), KC.LEFT],
+    KC.F     : [unicode_string_sequence('「」'), KC.LEFT],
+    KC.NGF   : [unicode_string_sequence('「」'), KC.LEFT],
+}
+
 ngcomb = {
     1: [ # 1キー
         [[0      ]], # 0
@@ -412,4 +459,51 @@ ngcomb = {
         [[0      ], [1, 2   ], [2, 3   ]           ], # 0   12  23
         [[0, 1, 2], [2, 3   ]                      ], # 012 23
     ],
+    # 5キーの組み合わせは遅すぎる。4キーでもオーバーフロー処理をすれば正しく変換できてる。
+    # 5: [ # 5キー
+    #     # 5分割 連続シフトなし
+    #     [[0      ], [1      ], [2      ], [3      ], [4      ]], # 0 1 2 3 4
+    #     # 4分割 連続シフトなし
+    #     [[0, 1   ], [2      ], [3      ], [4      ]           ], # 01  2   3   4
+    #     [[0      ], [1, 2   ], [3      ], [4      ]           ], # 0   12  3   4
+    #     [[0      ], [1      ], [2, 3   ], [4      ]           ], # 0   1   23  4
+    #     [[0      ], [1      ], [2      ], [3, 4   ]           ], # 0   1   2   34
+    #     # 3分割 連続シフトなし
+    #     [[0, 1, 2], [3      ], [4      ]                      ], # 012 3   4
+    #     [[0      ], [1, 2, 3], [4      ]                      ], # 0   123 4
+    #     [[0      ], [1      ], [2, 3, 4]                      ], # 0   1   234
+    #     [[0, 1   ], [2, 3   ], [4      ]                      ], # 01  23  4
+    #     [[0      ], [1, 2   ], [3, 4   ]                      ], # 0   12  34
+    #     [[0, 1   ], [2      ], [3, 4   ]                      ], # 01  2   34
+    #     # 2分割 連続シフトなし
+    #     [[0, 1, 2], [3, 4   ]                                 ], # 012 34
+    #     [[0, 1   ], [2, 3, 4]                                 ], # 01  234
+    #     # 0の連続シフト
+    #     [[0, 1   ], [0, 2   ], [3      ], [4      ]           ], # 01  02  3   4 : 2キー同時
+    #     [[0, 1   ], [0, 2   ], [0, 3   ], [4      ]           ], # 01  02  03  4
+    #     [[0, 1   ], [0, 2   ], [0, 3   ], [0, 4   ]           ], # 01  02  03  04
+    #     [[0, 1, 2], [0, 3, 4]                                 ], # 012 034 : 3キー同時
+    #     [[0, 1   ], [0, 2, 3], [4      ]                      ], # 01  023 4
+    #     [[0, 1   ], [0, 2, 3], [0, 4   ]                      ], # 01  023 04
+    #     [[0, 1   ], [0, 2   ], [0, 3, 4]                      ], # 01  02  034
+    #     # 1の連続シフト
+    #     [[0, 1   ], [1, 2   ], [3      ], [4      ]           ], # 01  12  3   4 : 2キー同時
+    #     [[0, 1   ], [1, 2   ], [1, 3   ], [4      ]           ], # 01  12  13  4
+    #     [[0, 1   ], [1, 2   ], [1, 3   ], [1, 4   ]           ], # 01  12  13  14
+    #     [[0      ], [1, 2   ], [1, 3   ], [4      ]           ], # 0   12  13  4
+    #     [[0      ], [1, 2   ], [1, 3   ], [1, 4   ]           ], # 0   12  13  14
+    #     [[0, 1, 2], [1, 3, 4]                                 ], # 012 134 : 3キー同時
+    #     [[0, 1, 2], [1, 3   ], [4      ]                      ], # 012 13  4
+    #     [[0      ], [1, 2, 3], [1, 4   ]                      ], # 0   123 14
+    #     [[0      ], [1, 2   ], [1, 3, 4]                      ], # 0   12  134
+    #     # 2の連続シフト
+    #     [[0      ], [1, 2   ], [2, 3   ], [4      ]           ], # 0   12  23 4 : 2キー同時
+    #     [[0      ], [1      ], [2, 3   ], [2, 4   ]           ], # 0   1   23 24
+    #     [[0, 1, 2], [2, 3, 4]                                 ], # 012 234 : 3キー同時
+    #     [[0      ], [1, 2   ], [2, 3, 4]                      ], # 0   12  234
+    #     [[0      ], [1, 2, 3], [2, 4   ]                      ], # 0   123 24
+    #     # 3の連続シフト
+    #     [[0      ], [1      ], [2, 3   ], [3, 4   ]           ], # 0   1   23  34 : 2キー
+    #     [[0      ], [1, 2, 3], [3, 4   ]                      ], # 0   123 34 : 3キー同時
+    # ],
 }
