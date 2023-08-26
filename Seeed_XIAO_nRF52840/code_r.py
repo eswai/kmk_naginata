@@ -19,7 +19,7 @@ keyboard = KMKKeyboard()
 keyboard.debug_enabled = True
 
 # 左と逆順
-keyboard.col_pins = (board.D1, board.D5, board.D4, board.D7, board.D10,)
+keyboard.col_pins = (board.D1, board.D5, board.D4, board.D8, board.D10,)
 keyboard.row_pins = (board.D2, board.D3, board.D0, board.D9,)
 keyboard.diode_orientation = DiodeOrientation.COL2ROW
 
@@ -37,11 +37,11 @@ keyboard.modules.append(holdtap)
 layers = Layers()
 keyboard.modules.append(layers)
 layers.combo_layers = {
-    (2, 3): 4,
+    (1, 2): 3,
 }
 
-LOWER = KC.MO(2)
-RAISE = KC.MO(3)
+LOWER = KC.MO(1)
+RAISE = KC.MO(2)
 SSPC = KC.HT(KC.SPC, KC.LSFT)
 SENT = KC.HT(KC.ENTER, KC.LSFT)
 
@@ -60,7 +60,7 @@ keyboard.keymap = [
         KC.Q     ,KC.W     ,KC.E     ,KC.R     ,KC.T     ,KC.Y     ,KC.U     ,KC.I     ,KC.O     ,KC.P     ,
         KC.A     ,KC.S     ,KC.D     ,KC.F     ,KC.G     ,KC.H     ,KC.J     ,KC.K     ,KC.L     ,KC.SCLN  ,
         KC.Z     ,KC.X     ,KC.C     ,KC.V     ,KC.B     ,KC.N     ,KC.M     ,KC.COMM  ,KC.DOT   ,KC.SLSH  ,
-        KC.NO    ,KC.NO    ,KC.LCTRL ,LOWER    ,SSPC     ,SENT     ,RAISE    ,KC.RCTRL ,KC.NO    ,KC.NO    ,
+        KC.NO    ,KC.LCTRL ,LOWER    ,SSPC     ,KC.NO    ,KC.NO    ,SENT     ,RAISE    ,KC.RCTRL ,KC.NO    ,
     ],
     # [
     # #  |---------+---------+---------+---------+---------+---------+---------+---------+---------+---------|
@@ -74,21 +74,21 @@ keyboard.keymap = [
         KC.TAB   ,KC.COLN  ,KC.SCLN  ,KC.DQT   ,KC.QUOT  ,KC.SLSH  ,KC.N7    ,KC.N8    ,KC.N9    ,KC.MINS  ,
         KC.ESC   ,KC.LBRC  ,KC.LCBR  ,KC.LPRN  ,KC.NO    ,KC.ASTR  ,KC.N4    ,KC.N5    ,KC.N6    ,KC.PLUS  ,
         KC.NO    ,KC.RBRC  ,KC.RCBR  ,KC.RPRN  ,KC.NO    ,KC.N0    ,KC.N1    ,KC.N2    ,KC.N3    ,KC.EQL   ,
-        KC.NO    ,KC.NO    ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.NO    ,KC.NO    ,
+        KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,
     ],
     [
     #  |---------+---------+---------+---------+---------+---------+---------+---------+---------+---------|
         KC.TILD  ,KC.AT    ,KC.HASH  ,KC.DLR   ,KC.NO    ,KC.NO    ,KC.HOME  ,KC.UP    ,KC.END   ,KC.DEL   ,
         KC.CIRC  ,KC.AMPR  ,KC.QUES  ,KC.PERC  ,KC.INT3  ,KC.NO    ,KC.LEFT  ,KC.DOWN  ,KC.RIGHT ,KC.BSPC  ,
         KC.GRV   ,KC.PIPE  ,KC.EXLM  ,KC.UNDS  ,KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,
-        KC.NO    ,KC.NO    ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.NO    ,KC.NO    ,
+        KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,
     ],
     [
     #  |---------+---------+---------+---------+---------+---------+---------+---------+---------+---------|
         KC.RESET ,KC.F1    ,KC.F2    ,KC.F3    ,KC.F4    ,KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,
         KC.DEBUG ,KC.F5    ,KC.F6    ,KC.F7    ,KC.F8    ,KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,
         KC.NO    ,KC.F9    ,KC.F10   ,KC.F11   ,KC.F12   ,KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,
-        KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,KC.NO    ,
+        KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,KC.TRNS  ,
     ],
 ]
 
