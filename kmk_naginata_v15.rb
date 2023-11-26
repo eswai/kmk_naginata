@@ -298,7 +298,7 @@ def kindex(a)
   o = $kfreq.index(b) || 1000
 end
 
-norder.sort!{|a, b| kindex(a[0]) <=> kindex(b[0])}
+# norder.sort!{|a, b| kindex(a[0]) <=> kindex(b[0])}
 
 puts norder.map{|x| x[1]}
 
