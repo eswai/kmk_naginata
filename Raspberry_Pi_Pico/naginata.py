@@ -8,7 +8,7 @@ from kmk.handlers.sequences import unicode_string_sequence
 
 kouchi_shift = False # 後置シフトを許す
 
-pressed_keys = 0 # 同時に押しているキーの数
+pressed_keys = set() # 同時に押しているキー
 nginput = [] # 未変換のキー KeyActionの配列
 max_keys = 4 # 5キーの組み合わせは遅すぎる。4キーでもオーバーフロー処理をすれば正しく変換できてる。
 # pure_shift_keys = [KC.NGSFT, KC.NGSFT2]
@@ -28,8 +28,9 @@ class KeyAction:
     def keycode_s(self):
         return self.keycode if self.keycode != KC.NGSFT2 else KC.NGSFT
     
-    def release_at_t(self, t):
-        return self.release_at if self.release_at > 0 else t
+    def release_at_t(self):
+        now = supervisor.ticks_ms()
+        return self.release_at if self.release_at > 0 else max(now, self.press_at + 10)
 
     def is_shift(self):
         return self.keycode in [KC.NGSFT, KC.NGSFT2, KC.NGF, KC.NGV, KC.NGJ, KC.NGM]
@@ -61,34 +62,37 @@ def ng_press(*args, **kwargs):
     global pressed_keys, now
     now = supervisor.ticks_ms()
     kc = args[0]
-    pressed_keys += 1
+
+    # シフトキーのキャリーオーバー
+    # まだおかしい
+    # jklで、あいう、のはずが、ああいう、になる
+    if len(nginput) < len(pressed_keys):
+        for pk in pressed_keys:
+            if pk in [KC.NGSFT, KC.NGSFT2, KC.NGF, KC.NGV, KC.NGJ, KC.NGM]:
+                nginput.insert(0, KeyAction(pk, now, 0))
+                break
+
+    pressed_keys.add(kc)
 
     # オーバーフロー
-    if pressed_keys > max_keys or len(nginput) >= max_keys:
+    if len(pressed_keys) > max_keys or len(nginput) >= max_keys:
         s = ng_type(True)
-        t = False
-        # 連続シフトの引き継ぎ
-        for ka in nginput[0:s]:
-            if ka.is_shift() and ka.release_at == 0:
-                if s < len(nginput): # シフトキー押した時間の仕切り直し
-                    ka.press_at = nginput[s].press_at
-                else: # 全部変換して残りがない場合
-                    ka.press_at = now
-                t = ka
-                break
         del nginput[0:s]
-        if t:
-            nginput.insert(0, t)
 
     nginput.append(KeyAction(kc, now, 0))
+
+    # 早期確定
+    if number_of_candidates() < 2:
+        s = ng_type(True)
+        del nginput[0:s]
+
     return False
 
 def ng_release(*args, **kwargs):
     global pressed_keys, now
     now = supervisor.ticks_ms()
     kc = args[0]
-    if pressed_keys > 0:
-        pressed_keys -= 1
+    pressed_keys.discard(kc)
     
     # リリース時間保存
     for ka in nginput:
@@ -97,7 +101,7 @@ def ng_release(*args, **kwargs):
             break
 
     # かな変換し出力
-    if pressed_keys == 0 and len(nginput) > 0:
+    if len(pressed_keys) == 0 and len(nginput) > 0:
         ng_type()
         nginput.clear()
 
@@ -120,10 +124,8 @@ def ng_type(partial = False):
         if lindex[0]: # 連続シフトがある組み合わせ
             for ka in nginput:
                 if ka.is_shift(): #　連続シフトが入っている & シフトキーを含んでいる
-                    print('ng_type shift key')
                     break
             else: # 連続シフトが入っている & シフトキーを含んでなかった
-                print('ng_type no-shift keys')
                 continue
         for cindex in lindex[1:]: # list(num)
             lka = [] # list(KeyAction)
@@ -182,6 +184,19 @@ def ng_type(partial = False):
     # 何キー処理したが返す
     return len(ks)
 
+def number_of_candidates():
+    noc = 0
+    
+    skc = set(map(lambda x: x.keycode_s(), nginput))
+    for k in ngdic: # (set(KC), list(KC))
+        if skc <= k[0]:
+            noc += 1
+            # if noc > 1:
+            #     break
+
+    print('NG num of candidates %d' % noc)
+    return noc
+
 def scoring(comb): #list(list(KeyAction))
     score = 0
     for lka in comb: # list(KeyAction)
@@ -189,10 +204,11 @@ def scoring(comb): #list(list(KeyAction))
             score += 100
         else:
             latest_press = max(map(lambda x: x.press_at, lka))
-            earliest_release = min(map(lambda x: x.release_at_t(now), lka))
+            earliest_release = min(map(lambda x: x.release_at_t(), lka))
             overlap = earliest_release - latest_press
             for ka in lka:
-                score += overlap * 1000 / (ka.release_at_t(now) - ka.press_at)
+                if ka.release_at_t() - ka.press_at > 0:
+                    score += overlap * 1000 / (ka.release_at_t() - ka.press_at)
     
     return score / len(comb)
 
