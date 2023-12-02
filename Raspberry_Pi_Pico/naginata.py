@@ -320,8 +320,8 @@ ngdic = [
     ({ KC.NGSFT , KC.NGC              }, [ KC.W, KC.O                   ]), # を
     ({ KC.NGCOMM                      }, [ KC.N, KC.N                   ]), # ん
     ({ KC.NGSCLN                      }, [ KC.MINS                      ]), # ー
-    ({ KC.NGSFT , KC.NGV              }, [ KC.COMM                      ]), # 、{Enter}
-    ({ KC.NGSFT , KC.NGM              }, [ KC.DOT                       ]), # 。{Enter}
+    ({ KC.NGSFT , KC.NGV              }, [ KC.COMM, KC.ENT              ]), # 、{Enter}
+    ({ KC.NGSFT , KC.NGM              }, [ KC.DOT, KC.ENT               ]), # 。{Enter}
     ({ KC.NGQ                         }, [ KC.V, KC.U                   ]), # ゔ
     ({ KC.NGSFT , KC.NGQ              }, [ KC.V, KC.U                   ]), # ゔ
     ({ KC.NGJ   , KC.NGF              }, [ KC.G, KC.A                   ]), # が
