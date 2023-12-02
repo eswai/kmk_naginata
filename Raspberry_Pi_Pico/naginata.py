@@ -63,28 +63,33 @@ def ng_press(*args, **kwargs):
     now = supervisor.ticks_ms()
     kc = args[0]
 
-    # シフトキーのキャリーオーバー
-    # まだおかしい
-    # jklで、あいう、のはずが、ああいう、になる
-    if len(nginput) < len(pressed_keys):
-        for pk in pressed_keys:
-            if pk in [KC.NGSFT, KC.NGSFT2, KC.NGF, KC.NGV, KC.NGJ, KC.NGM]:
-                nginput.insert(0, KeyAction(pk, now, 0))
-                break
-
     pressed_keys.add(kc)
 
     # オーバーフロー
     if len(pressed_keys) > max_keys or len(nginput) >= max_keys:
         s = ng_type(True)
         del nginput[0:s]
+        # シフトキーのキャリーオーバー
+        # まだおかしい
+        # jklで、あいう、のはずが、ああいう、になる
+        # 次にシフトがかかるならいいけど、シフトの組みあわせがないのにキャリーオーバーしてはいけない
+        # jklと同時押しするとkを飛び越してjlへシフトがキャリーオーバーする
+        skc = set(map(lambda x: x.keycode_s(), nginput))
+        # if len(nginput) < len(pressed_keys):
+        for pk in pressed_keys:
+            if pk in [KC.NGSFT, KC.NGSFT2, KC.NGF, KC.NGV, KC.NGJ, KC.NGM]:
+                if pk not in skc:
+                    print('NG shift carry-over')
+                    t = nginput[0].press_at
+                    nginput.insert(0, KeyAction(pk, t, 0))
+                    break
 
     nginput.append(KeyAction(kc, now, 0))
 
     # 早期確定
-    if number_of_candidates() < 2:
-        s = ng_type(True)
-        del nginput[0:s]
+    # if number_of_candidates(nginput) < 2:
+    #     s = ng_type(True)
+    #     del nginput[0:s]
 
     return False
 
@@ -184,12 +189,12 @@ def ng_type(partial = False):
     # 何キー処理したが返す
     return len(ks)
 
-def number_of_candidates():
+def number_of_candidates(keys):
     noc = 0
     
-    skc = set(map(lambda x: x.keycode_s(), nginput))
+    skc = set(map(lambda x: x.keycode_s(), keys))
     for k in ngdic: # (set(KC), list(KC))
-        if skc <= k[0]:
+        if skc <= k[0]: # 部分集合
             noc += 1
             # if noc > 1:
             #     break
