@@ -70,10 +70,6 @@ def ng_press(*args, **kwargs):
         s = ng_type(True)
         del nginput[0:s]
         # シフトキーのキャリーオーバー
-        # まだおかしい
-        # jklで、あいう、のはずが、ああいう、になる
-        # 次にシフトがかかるならいいけど、シフトの組みあわせがないのにキャリーオーバーしてはいけない
-        # jklと同時押しするとkを飛び越してjlへシフトがキャリーオーバーする
         skc = set(map(lambda x: x.keycode_s(), nginput))
         # if len(nginput) < len(pressed_keys):
         for pk in pressed_keys:
