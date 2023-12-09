@@ -11,7 +11,7 @@ from kmk.scanners import DiodeOrientation
 from kmk.modules.layers import Layers
 from kmk.modules.combos import Combos, Chord, Sequence
 from kmk.modules.holdtap import HoldTap
-from naginata import initNaginata
+from naginata import ng_initialize
 from kmk.consts import UnicodeMode
 
 keyboard = KMKKeyboard()
@@ -41,19 +41,19 @@ SSPC = KC.HT(KC.SPC, KC.LSFT)
 SENT = KC.HT(KC.ENTER, KC.LSFT)
 NGTG = KC.TG(1)
 
-initNaginata(keyboard, layers, 1)
+ng_initialize(keyboard, layers, 1)
 
 combos.combos = [
     Chord((KC.H  , KC.J  ), KC.NGON , timeout = 100, per_key_timeout = False, fast_reset = True),
     Chord((KC.NGF, KC.NGG), KC.NGOFF, timeout = 100, per_key_timeout = False, fast_reset = True),
-    Chord((KC.D  , KC.F     ), KC.NGH1),
-    Chord((KC.NGD, KC.NGF   ), KC.NGH1),
-    Chord((KC.J  , KC.K     ), KC.NGH1),
-    Chord((KC.NGJ, KC.NGK   ), KC.NGH1),
-    Chord((KC.C  , KC.V     ), KC.NGH2),
-    Chord((KC.NGC, KC.NGV   ), KC.NGH2),
-    Chord((KC.M  , KC.COMM  ), KC.NGH2),
-    Chord((KC.NGM, KC.NGCOMM), KC.NGH2),
+    # Chord((KC.D  , KC.F     ), KC.NGH1),
+    # Chord((KC.NGD, KC.NGF   ), KC.NGH1),
+    # Chord((KC.J  , KC.K     ), KC.NGH1),
+    # Chord((KC.NGJ, KC.NGK   ), KC.NGH1),
+    # Chord((KC.C  , KC.V     ), KC.NGH2),
+    # Chord((KC.NGC, KC.NGV   ), KC.NGH2),
+    # Chord((KC.M  , KC.COMM  ), KC.NGH2),
+    # Chord((KC.NGM, KC.NGCOMM), KC.NGH2),
 ]
 
 keyboard.keymap = [
