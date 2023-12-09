@@ -38,7 +38,7 @@ class KeyAction:
     def is_pure_shift(self):
         return self.keycode in [KC.NGSFT, KC.NGSFT2]
 
-def initNaginata(_kb, _layers, _ng_layer):
+def ng_initialize(_kb, _layers, _ng_layer):
     global kb, kblayers, ng_layer
     kb = _kb
     kblayers = _layers
@@ -166,7 +166,6 @@ def ng_type(partial = False):
         bc = best_comb
 
     # かなに変換する
-    keyseq = []
     ks = set() # 削除するキーセット
     for k in bc:
         s = set(map(lambda x: x.keycode_s(), k))
@@ -174,11 +173,11 @@ def ng_type(partial = False):
             ks.add(ka)
         for l in ngdic:
             if l[0] == s:
-                keyseq += l[1]
+                if type(l[1]) is list:
+                    kb.tap_key(simple_key_sequence(l[1]))
+                else:
+                    l[1]() # lambdaを実行
                 break
-
-    kcs = simple_key_sequence(keyseq)
-    kb.tap_key(kcs)
 
     print('ng_type %d-keys took %d ms' % (len(nginput), supervisor.ticks_ms() - tstart))
 
@@ -262,13 +261,13 @@ KC.NGA.before_press_handler(ng_henshu)
 
 # かな変換テーブル setはdictionaryのキーにできないので配列に
 ngdic = [
-    ({ KC.NGU                         }, [ KC.BSPC                      ]),
-    ({ KC.NGSFT                       }, [ KC.SPC                       ]),
-    ({ KC.NGM   , KC.NGV              }, [ KC.ENT                       ]),
-    ({ KC.NGT                         }, [ KC.LEFT                      ]),
-    ({ KC.NGY                         }, [ KC.RIGHT                     ]),
-    ({ KC.NGSFT , KC.NGT              }, [ KC.LSFT(KC.LEFT)             ]), # 操作感悪い
-    ({ KC.NGSFT , KC.NGY              }, [ KC.LSFT(KC.RIGHT)            ]), # 操作感悪い
+    ({ KC.NGU                         }, lambda: kb.tap_key(simple_key_sequence([KC.BSPC                      ]))),
+    ({ KC.NGSFT                       }, lambda: kb.tap_key(simple_key_sequence([KC.SPC                       ]))),
+    ({ KC.NGM   , KC.NGV              }, lambda: kb.tap_key(simple_key_sequence([KC.ENT                       ]))),
+    ({ KC.NGT                         }, lambda: kb.tap_key(simple_key_sequence([KC.LEFT                      ]))),
+    ({ KC.NGY                         }, lambda: kb.tap_key(simple_key_sequence([KC.RIGHT                     ]))),
+    ({ KC.NGSFT , KC.NGT              }, lambda: kb.tap_key(simple_key_sequence([KC.LSFT(KC.LEFT)             ]))), # 操作感悪い
+    ({ KC.NGSFT , KC.NGY              }, lambda: kb.tap_key(simple_key_sequence([KC.LSFT(KC.RIGHT)            ]))), # 操作感悪い
 
   # 清音外来音 濁音外来音
     ({ KC.NGJ                         }, [ KC.A                         ]), # あ
