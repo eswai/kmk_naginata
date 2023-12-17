@@ -36,8 +36,11 @@ def ng_press(*args, **kwargs):
     # 前のキーと同時押しはない
     else:
         # 連続シフトする
+        # がある　がる (JIの組み合わせがあるからJがC/Oされる) strictモードを作る
+        # あいあう　あいう
+        # ぎょあう　ぎょう
         for rs in [KC.NGSFT, KC.NGSFT2, KC.NGF, KC.NGV, KC.NGJ, KC.NGM]:
-            if rs in pressed_keys and number_of_candidates([rs, kc]) > 0:
+            if rs in pressed_keys and number_of_candidates([rs, kc], True) > 0:
                 nginput.append([rs, kc])
                 break
         # 連続シフトではない
@@ -86,19 +89,28 @@ def ng_type(keys):
         ng_type(keys)
         ng_type([kl])
 
-def number_of_candidates(keys):
+def number_of_candidates(keys, strict = False):
     noc = 0
     
     skc = set(map(lambda x: KC.NGSFT if x == KC.NGSFT2 else x, keys))
-    for k in ngdic: # (set(KC), list(KC))
-        if skc <= (k[0] | k[1]): # 部分集合
-            if KC.NGSFT in k[0]:
-                if keys[0] == KC.NGSFT or keys[0] == KC.NGSFT2:  # 前置シフトしか認めない
+    if strict:
+        for k in ngdic: # (set(KC), list(KC))
+            if skc == (k[0] | k[1]): # おなじ集合
+                if KC.NGSFT in k[0]:
+                    if keys[0] == KC.NGSFT or keys[0] == KC.NGSFT2:  # 前置シフトしか認めない
+                        noc += 1
+                else:
                     noc += 1
-            else:
-                noc += 1
-            # if noc > 1:
-            #     break
+    else:
+        for k in ngdic: # (set(KC), list(KC))
+            if skc <= (k[0] | k[1]): # 部分集合
+                if KC.NGSFT in k[0]:
+                    if keys[0] == KC.NGSFT or keys[0] == KC.NGSFT2:  # 前置シフトしか認めない
+                        noc += 1
+                else:
+                    noc += 1
+                # if noc > 1:
+                #     break
 
     print('NG num of candidates %d' % noc)
     return noc
@@ -117,21 +129,6 @@ def naginata_off(*args, **kwargs):
     kb.tap_key(KC.INT5)
     return False
 
-def ng_henshu1_on(*args, **kwargs):
-    global henshu_mode
-    henshu_mode = 1
-    return False
-
-def ng_henshu2_on(*args, **kwargs):
-    global henshu_mode
-    henshu_mode = 2
-    return False
-
-def ng_henshu_off(*args, **kwargs):
-    global henshu_mode
-    henshu_mode = 0
-    return False
-
 # キーの定義
 ngkeys = [
     'NGQ', 'NGW', 'NGE', 'NGR', 'NGT', 'NGY', 'NGU', 'NGI', 'NGO', 'NGP', 
@@ -144,11 +141,6 @@ for k in ngkeys:
 
 make_key(names=('NGON' ,), on_release = naginata_on) # on_releaseの方が安定する
 make_key(names=('NGOFF',), on_release = naginata_off)
-# make_key(names=('NGH1', ), on_press = ng_henshu1_on, on_release = ng_henshu_off)
-# make_key(names=('NGH2', ), on_press = ng_henshu2_on, on_release = ng_henshu_off)
-
-# KC.A.before_press_handler(ng_henshu)
-# KC.NGA.before_press_handler(ng_henshu)
 
 # かな変換テーブル setはdictionaryのキーにできないので配列に
 ngdic = [
@@ -158,7 +150,7 @@ ngdic = [
     (  set()     , { KC.NGT                    }, [ KC.LEFT                      ]),
     (  set()     , { KC.NGY                    }, [ KC.RIGHT                     ]),
     ({ KC.NGSFT }, { KC.NGT                    }, [ KC.LSFT(KC.LEFT)             ]),
-    ({ KC.NGSFT }, { KC.NGY                    }, lambda: kb.tap_key(simple_key_sequence([KC.LSFT(KC.RIGHT)]))),
+    ({ KC.NGSFT }, { KC.NGY                    }, [ KC.LSFT(KC.RIGHT)            ]),
     (  set()     , { KC.NGSCLN                 }, [ KC.MINS                      ]), # ー
     ({ KC.NGSFT }, { KC.NGV                    }, [ KC.COMM, KC.ENT              ]), # 、{Enter}
     ({ KC.NGSFT }, { KC.NGM                    }, [ KC.DOT, KC.ENT               ]), # 。{Enter}
@@ -326,6 +318,8 @@ ngdic = [
 
     ({ KC.NGD, KC.NGF    }, { KC.NGSCLN }, [ KC.LCTL(KC.K)                                       ]), # ^i
     ({ KC.NGD, KC.NGF    }, { KC.NGSLSH }, [ KC.LCTL(KC.J)                                       ]), # ^u
+    ({ KC.NGJ, KC.NGK    }, { KC.NGD    }, [ KC.LSFT(KC.SLSH), KC.ENT                            ]), # ？{改行}
+    ({ KC.NGJ, KC.NGK    }, { KC.NGC    }, [ KC.LSFT(KC.N1), KC.ENT                              ]), # ！{改行}
 
 
 ]
