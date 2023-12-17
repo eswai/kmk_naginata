@@ -130,8 +130,7 @@ r_gairai.flatten!
 
 $kfreq = ['い', 'う', 'ん', 'か', 'の', 'と', 'し', 'た', '、', 'く', 'な', 'て', 'に', 'は', 'こ', 'る', '。', 'が', 'で', 'っ', 'す', 'き', 'ま', 'も', 'つ', 'お', 'ら', 'を', 'さ', 'あ', 'り', 'れ', 'だ', 'せ', 'け', 'じ', 'ー', 'よ', 'ど', 'そ', 'え', 'わ', 'ち', 'み', 'め', 'ば', 'や', 'ひ', 'ろ', 'ほ', 'しょ', 'ぶ', 'ふ', 'ね', 'ご', 'じょ', 'げ', 'しゅ', 'む', 'きょ', 'ず', 'ぎ', 'しゃ', 'ちょ', 'び', 'ざ', 'ぐ', 'ぜ', 'へ', 'べ', 'ゆ', 'じゅ', 'ぼ', 'ぷ', 'りょ', 'ぞ', 'ぱ', 'きゅ', 'ちゅ', 'ぎょ', 'ぽ', 'にゅ', 'ひょ', 'づ', 'じゃ', 'ちゃ', 'ぬ', 'てぃ', 'ぴ', 'りゅ', 'ぺ', 'きゃ', 'ふぁ', 'でぃ', 'ぁ', 'しぇ', 'びょ', 'りゃ', 'ふぃ', 'ちぇ', 'ぎゃ', 'うぇ', 'なぁ', 'ぃ', 'ふぇ', 'ぴょ', 'ぴゅ', 'じぇ', 'ふぉ', 'ぇ', 'ゔ', 'びゅ', 'ぢ', 'みょ', 'ひゃ', 'みゅ', 'ぎゅ', 'ぉ', 'みぃ', 'ゔぁ', 'うぃ', 'にょ', 'ねぇ', 'ぅ', 'まぁ', 'ゅ', 'ねぃ', 'でゅ', 'みゃ', 'にゃ', 'うぉ', 'かぁ', 'とぅ', 'くぉ', 'ひゅ', 'りぃ', 'はぁ', 'へぇ', 'だぁ', 'ぎぃ', 'どぅ', 'しぃ', 'ゔぃ', 'おぉ', 'ゔぇ', 'てぇ', 'やぁ', 'ぴゃ', 'びゃ', 'あぁ', 'つぁ', 'もぉ', 'ゃぁ', 'つぃ', 'ふゅ', 'ぅぃ', 'さぁ', 'よぉ', 'ぬぁ', 'げぇ', 'ぁぁ', 'たぁ', 'わぁ', 'らぁ', 'にぇ', 'ぉぉ', 'ぉぃ', 'ょ', 'ぃぃ', 'つぇ', 'にぃ', 'ぅぅ', 'ふぅ', 'るぅ', 'えぇ', 'じぃ', 'ぜぃ', 'びぃ', 'べぇ', 'とぉ', 'つぉ', 'ぞぉ', 'ゃ', 'るぁ', 'きぃ', 'ちぃ', 'すぃ', 'ぬぃ', 'いぃ', 'うぅ', 'よぅ', 'むぅ', 'ぐぅ', 'くぅ', 'っぅ', 'のぅ', 'ぜぇ', 'でぇ', 'やぇ', 'けぇ', 'ひぇ', 'せぇ', 'きぇ', 'さぇ', 'まぇ', 'ゔぉ', 'ぢゃ', 'ゎ', ]
 
-# ({             }, {          }, { KC.NGO                }, [ KC.S, KC.U             ]), # す (単打)
-def teigi2(sft, doujir, doujin, kanakc, kana)
+def teigi(sft, doujir, doujin, kanakc, kana)
   _sft    = [sft].flatten.map{|k| sprintf("KC.NG%s", k)}
   _doujir = [doujir].flatten.map{|k| sprintf("KC.NG%s", k)}
   _doujin = [doujin].flatten.map{|k| sprintf("KC.NG%s", k)}
@@ -139,21 +138,11 @@ def teigi2(sft, doujir, doujin, kanakc, kana)
   for i in 0..(kanakc.length - 1)
     _kanakc.push sprintf("KC.%s", kanakc[i].upcase)
   end
-  # sprintf("    ({ %-13s }, { %-6s }, { %-16s }, [ %-24s ]), # %s", _sft.join(','), _doujir.join(','), _doujin.join(','), _kanakc.join(','), kana)
-  sprintf("    ({ %-30s }, [ %-24s ]), # %s", (_sft + _doujir + _doujin).join(', '), _kanakc.join(', '), kana)
-end
-
-def teigi(a, b, c, prefix=nil, suffix=nil)
-  _a = prefix ? [sprintf("KC.NG%-4s", prefix)] : []
-  _a += [a].flatten.map{|k| sprintf("KC.NG%-4s", k)}
-  _a += [sprintf("KC.NG%-4s", suffix)] if suffix
-  _b = []
-  for i in 0..(b.length - 1)
-    _b.push sprintf("KC.%-1s", b[i].upcase)
+  if _sft.length > 0
+    sprintf("    ({ %-8s }, { %-25s }, [ %-28s ]), # %s", _sft.join(', '), (_doujir + _doujin).join(', '), _kanakc.join(', '), kana)
+  else
+    sprintf("    (  set()     , { %-25s }, [ %-28s ]), # %s", (_doujir + _doujin).join(', '), _kanakc.join(', '), kana)
   end
-  r = sprintf("    ({ %-31s}", _a.join(", "))
-  r+= sprintf(", [ %-29s]", _b.join(", ")) + "), # #{c}"
-  r
 end
 
 norder = []
@@ -162,11 +151,11 @@ puts "  # 清音"
 kana.each_with_index do |k, i|
   j = tanda.index(k)
   if j && j >= 0
-    norder << [k, teigi2([], [], eiji[j], r_kana[i], k)]
+    norder << [k, teigi([], [], eiji[j], r_kana[i], k)]
   end
   j = shifted.index(k)
   if j && j >= 0
-    norder << [k, teigi2(['SFT'], [], eiji[j], r_kana[i], k)]
+    norder << [k, teigi(['SFT'], [], eiji[j], r_kana[i], k)]
   end
 end
 
@@ -176,9 +165,9 @@ daku.each_with_index do |k, i|
   j = tanda.index(t_daku[i]) || shifted.index(t_daku[i])
   if j && j >= 0
     if eiji_r.index(eiji[j])
-      norder << [k, teigi2([], ['F'], eiji[j], r_daku[i], k)]
+      norder << [k, teigi([], ['F'], eiji[j], r_daku[i], k)]
     else
-      norder << [k, teigi2([], ['J'], eiji[j], r_daku[i], k)]
+      norder << [k, teigi([], ['J'], eiji[j], r_daku[i], k)]
     end
   end
 end
@@ -189,9 +178,9 @@ handaku.each_with_index do |k, i|
   j = tanda.index(t_handaku[i]) || shifted.index(t_handaku[i])
   if j && j >= 0
     if eiji_r.index(eiji[j])
-      norder << [k, teigi2([], ['V'], eiji[j], r_handaku[i], k)]
+      norder << [k, teigi([], ['V'], eiji[j], r_handaku[i], k)]
     else
-      norder << [k, teigi2([], ['M'], eiji[j], r_handaku[i], k)]
+      norder << [k, teigi([], ['M'], eiji[j], r_handaku[i], k)]
     end
   end
 end
@@ -201,18 +190,18 @@ puts "  # 小書き"
 kogaki.each_with_index do |k, i|
   j = tanda.index(k)
   if j && j >= 0
-    norder << [k, teigi2([], [], eiji[j], r_kogaki[i], k)]
+    norder << [k, teigi([], [], eiji[j], r_kogaki[i], k)]
     next
   end
   j = shifted.index(k)
   if j && j >= 0
-    norder << [k, teigi2(['SFT'], [], eiji[j], r_kogaki[i], k)]
+    norder << [k, teigi(['SFT'], [], eiji[j], r_kogaki[i], k)]
     next
   end
 
   j = tanda.index(t_kogaki[i]) || shifted.index(t_kogaki[i])
   if j && j >= 0
-    norder << [k, teigi2([], [], ['Q', eiji[j]], r_kogaki[i], k)]
+    norder << [k, teigi([], [], ['Q', eiji[j]], r_kogaki[i], k)]
   end
 end
 
@@ -265,9 +254,9 @@ kumiawase.each_with_index do |k, i|
   if j && j >= 0
     e1 = eiji[j]
     if e3
-       norder << [k, teigi2([], [e3], [e0, e1], r_kumiawase[i], k)]
+       norder << [k, teigi([], [e3], [e0, e1], r_kumiawase[i], k)]
     else
-      norder << [k, teigi2([], [], [e0, e1], r_kumiawase[i], k)]
+      norder << [k, teigi([], [], [e0, e1], r_kumiawase[i], k)]
     end
   end
 end
@@ -306,9 +295,9 @@ end
   if j && j >= 0
     e1 = eiji[j]
     if e3
-      norder << [k, teigi2([], [e3], [e0, e1], r_kumiawase[i], k)]
+      norder << [k, teigi([], [e3], [e0, e1], r_gairai[i], k)]
     else
-      norder << [k, teigi2([], [], [e0, e1], r_kumiawase[i], k)]
+      norder << [k, teigi([], [], [e0, e1], r_gairai[i], k)]
     end
   end
 end
@@ -321,55 +310,54 @@ end
 # norder.sort!{|a, b| kindex(a[0]) <=> kindex(b[0])}
 
 puts norder.map{|x| x[1]}
-return
 
 # 編集モード
 
 $henshu = {
   "+{End}" => ["register_code(KC_LSFT);", "ng_end();", "unregister_code(KC_LSFT);"],
   "+{Home}" => ["register_code(KC_LSFT);", "ng_home();", "unregister_code(KC_LSFT);"],
-  "+{← 20}" => ["register_code(KC_LSFT);", "ng_left(20);", "unregister_code(KC_LSFT);"],
-  "+{← 5}" => ["register_code(KC_LSFT);", "ng_left(5);", "unregister_code(KC_LSFT);"],
-  "+{←}" => ["register_code(KC_LSFT);", "ng_left(1);", "unregister_code(KC_LSFT);"],
-  "+{↑ 7}" => ["register_code(KC_LSFT);", "ng_up(7);", "unregister_code(KC_LSFT);"],
-  "+{↑}" => ["register_code(KC_LSFT);", "ng_up(1);", "unregister_code(KC_LSFT);"],
-  "+{→ 20}" => ["register_code(KC_LSFT);", "ng_right(20);", "unregister_code(KC_LSFT);"],
-  "+{→ 5}" => ["register_code(KC_LSFT);", "ng_right(5);", "unregister_code(KC_LSFT);"],
-  "+{→}" => ["register_code(KC_LSFT);", "ng_right(1);", "unregister_code(KC_LSFT);"],
-  "+{↓ 7}" => ["register_code(KC_LSFT);", "ng_down(7);", "unregister_code(KC_LSFT);"],
-  "+{↓}" => ["register_code(KC_LSFT);", "ng_down(1);", "unregister_code(KC_LSFT);"],
-  "/*ディ*/" => [""],
-  "^c" => ["ng_copy();"],
-  "^i" => ["ng_katakana();"],
-  "^s" => ["ng_save();"],
-  "^u" => ["ng_hiragana();"],
-  "^v" => ["ng_paste();"],
-  "^x" => ["ng_cut();"],
-  "^y" => ["ng_redo();"],
-  "^z" => ["ng_undo();"],
+  "+{← 20}" => ["KC.LSFT(KC.LEFT)"] * 20,
+  "+{← 5}" => ["KC.LSFT(KC.LEFT)"] * 5,
+  "+{←}" => ["KC.LSFT(KC.LEFT)"],
+  "+{↑ 7}" => ["KC.LSFT(KC.UP)"] * 7,
+  "+{↑}" => ["KC.LSFT(KC.UP)"],
+  "+{→ 20}" => ["KC.LSFT(KC.RIGHT)"] * 20,
+  "+{→ 5}" => ["KC.LSFT(KC.RIGHT)"] * 5,
+  "+{→}" => ["KC.LSFT(KC.RIGHT)"],
+  "+{↓ 7}" => ["KC.LSFT(KC.DOWN)"] * 7,
+  "+{↓}" => ["KC.LSFT(KC.DOWN)"],
+  "/*ディ*/" => ["KC.D, KC.H, KC.I"],
+  "^c" => ["KC.LGUI(KC.C)"],
+  "^i" => ["KC.LCTL(KC.K)"],
+  "^s" => ["KC.LGUI(KC.S)"],
+  "^u" => ["KC.LCTL(KC.J)"],
+  "^v" => ["KC.LGUI(KC.V)"],
+  "^x" => ["KC.LGUI(KC.X)"],
+  "^y" => ["KC.LSFT(KC.LGUI(KC.Z))"],
+  "^z" => ["KC.LGUI(KC.Z)"],
   "^{End}" => ["ng_eof();"],
-  "{BS}" => ["tap_code(KC_BSPC);"],
-  "{Del 1}" => ["tap_code(KC_DEL);"],
-  "{Del 2}" => ["tap_code(KC_DEL);"] * 2,
-  "{Del 3}" => ["tap_code(KC_DEL);"] * 3,
-  "{Del 4}" => ["tap_code(KC_DEL);"] * 4,
-  "{Del}" => ["tap_code(KC_DEL);"],
+  "{BS}" => ["KC_BSPC"],
+  "{Del 1}" => ["KC_DEL"],
+  "{Del 2}" => ["KC_DEL"] * 2,
+  "{Del 3}" => ["KC_DEL"] * 3,
+  "{Del 4}" => ["KC_DEL"] * 4,
+  "{Del}" => ["KC_DEL"],
   "{End}" => ["ng_end();"],
-  "{Enter}" => ["tap_code(KC_ENT);"],
-  "{Esc 3}" => ["tap_code(KC_ESC);"] * 3,
+  "{Enter}" => ["KC_ENT"],
+  "{Esc 3}" => ["KC_ESC"] * 3,
   "{Home}" => ["ng_home();"],
-  "{Space 1}" => ["tap_code(KC_SPC);"],
-  "{Space 3}" => ["tap_code(KC_SPC);"] * 3,
-  "{Space}" => ["tap_code(KC_SPC);"],
+  "{Space 1}" => ["KC_SPC"],
+  "{Space 3}" => ["KC_SPC"] * 3,
+  "{Space}" => ["KC_SPC"],
   "{vk1Csc079}" => ["ng_saihenkan();"], # 再変換
-  "{← 5}" => ["ng_left(5);"],
-  "{←}" => ["ng_left(1);"],
-  "{↑}" => ["ng_up(1);"],
-  "{→ 5}" => ["ng_right(5);"],
-  "{→}" => ["ng_right(1);"],
-  "{↓}" => ["ng_down(1);"],
-  "{改行 2}" => ["tap_code(KC_ENT);"] * 2,
-  "{改行}" => ["tap_code(KC_ENT);"],
+  "{← 5}" => ["KC.LEFT"] * 5,
+  "{←}" => ["KC.LEFT"],
+  "{↑}" => ["KC.UP"],
+  "{→ 5}" => ["KC.RIGHT"] * 5,
+  "{→}" => ["KC.RIGHT"],
+  "{↓}" => ["KC.DOWN"],
+  "{改行 2}" => ["KC_ENT"] * 2,
+  "{改行}" => ["KC_ENT"],
  }
  
 qwerty    = %w(Q W E R T  Y U I O P NO NO A S D F G  H J K L SCLN NO NO Z X C V B  N M COMM DOT SLSH NO)
@@ -383,10 +371,10 @@ mode2r = mode2r.split("|").map{|x| x.strip}
 $hcase = []
 $hkey = []
 
-def outputHenshu(pk, m, k)
-  $hcase << "    case #{pk}|B_#{k}: # #{m}"
+def outputHenshu(sft, douji, m)
+  # $hcase << "    case #{pk}|B_#{k}: # #{m}"
   v = m.scan(/((?:\^?\+?{.+?})|(?:\^.)|(?:[^{}\^\+]+))/).flatten
-  d = []
+  hcode = []
   uc = false
   v.each do |i|
     if $henshu.key? i
@@ -394,45 +382,50 @@ def outputHenshu(pk, m, k)
         uc = false
         next
       end
-      d << $henshu[i]
+      hcode << $henshu[i]
     else
-      d << "ng_send_unicode_string_P(PSTR(\"#{i}\"));"
+      hcode << "unicode_string_sequence(\"#{i}\")"
       uc = true
     end
   end
-  $hcase += d.flatten.map{|x| "      #{x}"}
-  $hcase << "      henshu_done = true;"
-  $hcase << "      return true;"
-  $hcase << "      break;"
-  $hkey << "  {.key = #{pk}|B_#{k}}, # #{m}"
+
+  _sft    = [sft].flatten.map{|k| sprintf("KC.NG%s", k)}
+  _douji = [douji].flatten.map{|k| sprintf("KC.NG%s", k)}
+  $hcase << sprintf("    ({ %-17s }, { %-9s }, [ %-50s ]), # %s", _sft.join(', '), (_douji).join(', '), hcode.join(", "), m)
+
+  # $hcase += d.flatten.map{|x| "      #{x}"}
+  # $hcase << "      henshu_done = true;"
+  # $hcase << "      return true;"
+  # $hcase << "      break;"
+  # $hkey << "  {.key = #{pk}|B_#{k}}, # #{m}"
 end
 
 qwerty.each_with_index do |k, i|
   m =  mode1l[i]
   pk = "B_J|B_K"
-  outputHenshu(pk, m, k) unless m == ""
+  outputHenshu(['J', 'K'], k, m) unless m == ""
 end
 
 qwerty.each_with_index do |k, i|
   m =  mode1r[i]
   pk = "B_D|B_F"
-  outputHenshu(pk, m, k) unless m == ""
+  outputHenshu(['D', 'F'], k, m) unless m == ""
 end
 
 qwerty.each_with_index do |k, i|
   m =  mode2l[i]
   pk = "B_M|B_COMM"
-  outputHenshu(pk, m, k) unless m == ""
+  outputHenshu(['M', 'COMM'], k, m) unless m == ""
 end
 
 qwerty.each_with_index do |k, i|
   m =  mode2r[i]
   pk = "B_C|B_V"
-  outputHenshu(pk, m, k) unless m == ""
+  outputHenshu(['C', 'V'], k, m) unless m == ""
 end
 
 puts "# 編集モード"
-puts $hkey
+# puts $hkey
 puts $hcase
 
 $hkey = []
