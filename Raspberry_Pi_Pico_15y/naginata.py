@@ -36,11 +36,12 @@ def ng_press(*args, **kwargs):
     # 前のキーと同時押しはない
     else:
         # 連続シフトする
-        # がある　がる (JIの組み合わせがあるからJがC/Oされる) strictモードを作る
-        # あいあう　あいう
-        # ぎょあう　ぎょう
+        # がある　がる x (JIの組み合わせがあるからJがC/Oされる) strictモードを作る
+        # あいあう　あいう x
+        # ぎょあう　ぎょう x
+        # どか どが x 先にFがc/oされてJが残される
         for rs in [KC.NGSFT, KC.NGSFT2, KC.NGF, KC.NGV, KC.NGJ, KC.NGM]:
-            if rs in pressed_keys and number_of_candidates([rs, kc], True) > 0:
+            if rs != kc and rs in pressed_keys and number_of_candidates([rs, kc], True) > 0:
                 nginput.append([rs, kc])
                 break
         # 連続シフトではない
