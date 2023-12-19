@@ -39,7 +39,7 @@ def ng_press(*args, **kwargs):
         # がある　がる x (JIの組み合わせがあるからJがC/Oされる) strictモードを作る
         # あいあう　あいう x
         # ぎょあう　ぎょう x
-        # どか どが x 先にFがc/oされてJが残される
+        # どか どが x 先にFがc/oされてJが残される        
         for rs in [KC.NGSFT, KC.NGSFT2, KC.NGF, KC.NGV, KC.NGJ, KC.NGM]:
             if rs != kc and rs in pressed_keys and number_of_candidates([rs, kc], True) > 0:
                 nginput.append([rs, kc])
@@ -91,27 +91,39 @@ def ng_type(keys):
         ng_type([kl])
 
 def number_of_candidates(keys, strict = False):
+    if not keys:
+        return 0
+
     noc = 0
     
-    skc = set(map(lambda x: KC.NGSFT if x == KC.NGSFT2 else x, keys))
+    # skc = set(map(lambda x: KC.NGSFT if x == KC.NGSFT2 else x, keys))
     if strict:
-        for k in ngdic: # (set(KC), list(KC))
-            if skc == (k[0] | k[1]): # おなじ集合
-                if KC.NGSFT in k[0]:
-                    if keys[0] == KC.NGSFT or keys[0] == KC.NGSFT2:  # 前置シフトしか認めない
-                        noc += 1
-                else:
+        if keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) == 1:
+            return 1
+        elif keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) > 1:
+            # skc = set(map(lambda x: KC.NGSFT if x == KC.NGSFT2 else x, keys[1:])) # ２文字目以降にNGSFTは来ないはず
+            skc = set(keys[1:])
+            for k in ngdic: # (set(KC), list(KC))
+                if KC.NGSFT in k[0] and skc == k[1]:
+                    noc += 1
+        else:
+            skc = set(keys)
+            for k in ngdic: # (set(KC), list(KC))
+                if not k[0] and skc == k[1]:
                     noc += 1
     else:
-        for k in ngdic: # (set(KC), list(KC))
-            if skc <= (k[0] | k[1]): # 部分集合
-                if KC.NGSFT in k[0]:
-                    if keys[0] == KC.NGSFT or keys[0] == KC.NGSFT2:  # 前置シフトしか認めない
-                        noc += 1
-                else:
+        if keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) == 1:
+            return 30
+        elif keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) > 1:
+            skc = set(keys[1:])
+            for k in ngdic: # (set(KC), list(KC))
+                if KC.NGSFT in k[0] and skc <= k[1]:
                     noc += 1
-                # if noc > 1:
-                #     break
+        else:
+            skc = set(keys)
+            for k in ngdic: # (set(KC), list(KC))
+                if not k[0] and skc <= k[1]:
+                    noc += 1
 
     print('NG num of candidates %d' % noc)
     return noc
@@ -144,6 +156,7 @@ make_key(names=('NGON' ,), on_release = naginata_on) # on_releaseの方が安定
 make_key(names=('NGOFF',), on_release = naginata_off)
 
 # かな変換テーブル setはdictionaryのキーにできないので配列に
+# れ、をプレス時に出したい x
 ngdic = [
     (  set()     , { KC.NGU                    }, [ KC.BSPC                      ]),
     (  set()     , { KC.NGSFT                  }, [ KC.SPC                       ]),
