@@ -106,9 +106,24 @@ def number_of_candidates(keys, strict = False):
             for k in ngdic: # (set(KC), list(KC))
                 if KC.NGSFT in k[0] and skc == k[1]:
                     noc += 1
+        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGD, KC.NGF}:
+            for k in ngdic: # (set(KC), list(KC))
+                if k[0] == {KC.NGD, KC.NGF} and {keys[2]} == k[1]:
+                    noc = 1
+                    break
+        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGC, KC.NGV}:
+            for k in ngdic: # (set(KC), list(KC))
+                if k[0] == {KC.NGC, KC.NGV} and {keys[2]} == k[1]:
+                    noc = 1
+                    break
         elif len(keys) == 3 and set(keys[0:2]) == {KC.NGJ, KC.NGK}:
             for k in ngdic: # (set(KC), list(KC))
                 if k[0] == {KC.NGJ, KC.NGK} and {keys[2]} == k[1]:
+                    noc = 1
+                    break
+        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGM, KC.NGCOMM}:
+            for k in ngdic: # (set(KC), list(KC))
+                if k[0] == {KC.NGM, KC.NGCOMM} and {keys[2]} == k[1]:
                     noc = 1
                     break
         else:
