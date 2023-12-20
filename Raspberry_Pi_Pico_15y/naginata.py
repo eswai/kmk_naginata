@@ -99,13 +99,18 @@ def number_of_candidates(keys, strict = False):
     # skc = set(map(lambda x: KC.NGSFT if x == KC.NGSFT2 else x, keys))
     if strict:
         if keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) == 1:
-            return 1
+            nok = 1
         elif keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) > 1:
             # skc = set(map(lambda x: KC.NGSFT if x == KC.NGSFT2 else x, keys[1:])) # ２文字目以降にNGSFTは来ないはず
             skc = set(keys[1:])
             for k in ngdic: # (set(KC), list(KC))
                 if KC.NGSFT in k[0] and skc == k[1]:
                     noc += 1
+        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGJ, KC.NGK}:
+            for k in ngdic: # (set(KC), list(KC))
+                if k[0] == {KC.NGJ, KC.NGK} and {keys[2]} == k[1]:
+                    noc = 1
+                    break
         else:
             skc = set(keys)
             for k in ngdic: # (set(KC), list(KC))
@@ -113,19 +118,47 @@ def number_of_candidates(keys, strict = False):
                     noc += 1
     else:
         if keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) == 1:
-            return 30
+            noc = 30
+        elif set(keys) == {KC.NGD, KC.NGF}:
+            noc = 15
+        elif set(keys) == {KC.NGC, KC.NGV}:
+            noc = 15
+        elif set(keys) == {KC.NGJ, KC.NGK}:
+            noc = 15
+        elif set(keys) == {KC.NGM, KC.NGCOMM}:
+            noc = 15
         elif keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) > 1:
             skc = set(keys[1:])
             for k in ngdic: # (set(KC), list(KC))
                 if KC.NGSFT in k[0] and skc <= k[1]:
                     noc += 1
+        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGD, KC.NGF}:
+            for k in ngdic: # (set(KC), list(KC))
+                if k[0] == {KC.NGD, KC.NGF} and {keys[2]} == k[1]:
+                    noc = 1
+                    break
+        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGC, KC.NGV}:
+            for k in ngdic: # (set(KC), list(KC))
+                if k[0] == {KC.NGC, KC.NGV} and {keys[2]} == k[1]:
+                    noc = 1
+                    break
+        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGJ, KC.NGK}:
+            for k in ngdic: # (set(KC), list(KC))
+                if k[0] == {KC.NGJ, KC.NGK} and {keys[2]} == k[1]:
+                    noc = 1
+                    break
+        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGM, KC.NGCOMM}:
+            for k in ngdic: # (set(KC), list(KC))
+                if k[0] == {KC.NGM, KC.NGCOMM} and {keys[2]} == k[1]:
+                    noc = 1
+                    break
         else:
             skc = set(keys)
             for k in ngdic: # (set(KC), list(KC))
                 if not k[0] and skc <= k[1]:
                     noc += 1
 
-    print('NG num of candidates %d' % noc)
+    print('NG num of candidates %d (%d)' % (noc, strict))
     return noc
 
 def naginata_on(*args, **kwargs):
