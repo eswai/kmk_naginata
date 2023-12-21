@@ -6,7 +6,6 @@ from kmk.keys import KC
 from kmk.keys import make_key
 from kmk.handlers.sequences import send_string
 from kmk.handlers.sequences import simple_key_sequence
-from kmk.handlers.sequences import unicode_string_sequence
 
 pressed_keys = set() # 同時に押しているキー
 nginput = [] # 未変換のキー
@@ -39,10 +38,12 @@ def ng_press(*args, **kwargs):
         # がある　がる x (JIの組み合わせがあるからJがC/Oされる) strictモードを作る
         # あいあう　あいう x
         # ぎょあう　ぎょう x
-        # どか どが x 先にFがc/oされてJが残される        
-        for rs in [KC.NGSFT, KC.NGSFT2, KC.NGF, KC.NGV, KC.NGJ, KC.NGM]:
-            if rs != kc and rs in pressed_keys and number_of_candidates([rs, kc], True) > 0:
-                nginput.append([rs, kc])
+        # どか どが x 先にFがc/oされてJが残される
+        for rs in [{KC.NGD, KC.NGF}, {KC.NGC, KC.NGV}, {KC.NGJ, KC.NGK}, {KC.NGM, KC.NGCOMM}, {KC.NGSFT}, {KC.NGSFT2}, {KC.NGF}, {KC.NGV}, {KC.NGJ}, {KC.NGM}]:
+            rskc = list(rs)
+            rskc.append(kc)
+            if kc not in rs and rs <= pressed_keys and number_of_candidates(rskc, True) > 0:
+                nginput.append(rskc)
                 break
         # 連続シフトではない
         else:
@@ -99,79 +100,51 @@ def number_of_candidates(keys, strict = False):
     # skc = set(map(lambda x: KC.NGSFT if x == KC.NGSFT2 else x, keys))
     if strict:
         if keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) == 1:
-            nok = 1
+            noc = 1
         elif keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) > 1:
             # skc = set(map(lambda x: KC.NGSFT if x == KC.NGSFT2 else x, keys[1:])) # ２文字目以降にNGSFTは来ないはず
             skc = set(keys[1:])
-            for k in ngdic: # (set(KC), list(KC))
+            for k in ngdic:
                 if KC.NGSFT in k[0] and skc == k[1]:
                     noc += 1
-        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGD, KC.NGF}:
-            for k in ngdic: # (set(KC), list(KC))
-                if k[0] == {KC.NGD, KC.NGF} and {keys[2]} == k[1]:
-                    noc = 1
-                    break
-        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGC, KC.NGV}:
-            for k in ngdic: # (set(KC), list(KC))
-                if k[0] == {KC.NGC, KC.NGV} and {keys[2]} == k[1]:
-                    noc = 1
-                    break
-        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGJ, KC.NGK}:
-            for k in ngdic: # (set(KC), list(KC))
-                if k[0] == {KC.NGJ, KC.NGK} and {keys[2]} == k[1]:
-                    noc = 1
-                    break
-        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGM, KC.NGCOMM}:
-            for k in ngdic: # (set(KC), list(KC))
-                if k[0] == {KC.NGM, KC.NGCOMM} and {keys[2]} == k[1]:
-                    noc = 1
-                    break
         else:
-            skc = set(keys)
-            for k in ngdic: # (set(KC), list(KC))
-                if not k[0] and skc == k[1]:
-                    noc += 1
+            for rs in [{KC.NGD, KC.NGF}, {KC.NGC, KC.NGV}, {KC.NGJ, KC.NGK}, {KC.NGM, KC.NGCOMM}]:
+                if len(keys) == 3 and set(keys[0:2]) == rs:
+                    for k in ngdic:
+                        if k[0] == rs and {keys[2]} == k[1]:
+                            noc = 1
+                            break
+                    else:
+                        continue
+                    break
+            else:
+                skc = set(keys)
+                for k in ngdic:
+                    if not k[0] and skc == k[1]:
+                        noc += 1
     else:
-        if keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) == 1:
-            noc = 30
-        elif set(keys) == {KC.NGD, KC.NGF}:
-            noc = 15
-        elif set(keys) == {KC.NGC, KC.NGV}:
-            noc = 15
-        elif set(keys) == {KC.NGJ, KC.NGK}:
-            noc = 15
-        elif set(keys) == {KC.NGM, KC.NGCOMM}:
-            noc = 15
+        if set(keys) in [{KC.NGSFT}, {KC.NGSFT2}, {KC.NGD, KC.NGF}, {KC.NGC, KC.NGV}, {KC.NGJ, KC.NGK}, {KC.NGM, KC.NGCOMM}]:
+            noc = 2
         elif keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) > 1:
             skc = set(keys[1:])
-            for k in ngdic: # (set(KC), list(KC))
-                if KC.NGSFT in k[0] and skc <= k[1]:
+            for k in ngdic:
+                if KC.NGSFT in k[0] and skc <= k[1]: # <=だけ違う
                     noc += 1
-        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGD, KC.NGF}:
-            for k in ngdic: # (set(KC), list(KC))
-                if k[0] == {KC.NGD, KC.NGF} and {keys[2]} == k[1]:
-                    noc = 1
-                    break
-        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGC, KC.NGV}:
-            for k in ngdic: # (set(KC), list(KC))
-                if k[0] == {KC.NGC, KC.NGV} and {keys[2]} == k[1]:
-                    noc = 1
-                    break
-        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGJ, KC.NGK}:
-            for k in ngdic: # (set(KC), list(KC))
-                if k[0] == {KC.NGJ, KC.NGK} and {keys[2]} == k[1]:
-                    noc = 1
-                    break
-        elif len(keys) == 3 and set(keys[0:2]) == {KC.NGM, KC.NGCOMM}:
-            for k in ngdic: # (set(KC), list(KC))
-                if k[0] == {KC.NGM, KC.NGCOMM} and {keys[2]} == k[1]:
-                    noc = 1
-                    break
         else:
-            skc = set(keys)
-            for k in ngdic: # (set(KC), list(KC))
-                if not k[0] and skc <= k[1]:
-                    noc += 1
+            for rs in [{KC.NGD, KC.NGF}, {KC.NGC, KC.NGV}, {KC.NGJ, KC.NGK}, {KC.NGM, KC.NGCOMM}]:
+                if len(keys) == 3 and set(keys[0:2]) == rs:
+                    for k in ngdic:
+                        if k[0] == rs and {keys[2]} == k[1]:
+                            noc = 1
+                            break
+                    else:
+                        continue
+                    break
+            else:
+                skc = set(keys)
+                for k in ngdic:
+                    if not k[0] and skc <= k[1]: # <=だけ違う
+                        noc += 1
 
     print('NG num of candidates %d (%d)' % (noc, strict))
     return noc
@@ -206,6 +179,7 @@ make_key(names=('NGOFF',), on_release = naginata_off)
 # かな変換テーブル setはdictionaryのキーにできないので配列に
 # れ、をプレス時に出したい x
 ngdic = [
+    #  前置シフト      同時押し                        かな
     (  set()     , { KC.NGU                    }, [ KC.BSPC                      ]),
     (  set()     , { KC.NGSFT                  }, [ KC.SPC                       ]),
     (  set()     , { KC.NGM, KC.NGV            }, [ KC.ENT                       ]),
@@ -378,10 +352,49 @@ ngdic = [
     (  set()     , { KC.NGF, KC.NGH, KC.NGDOT  }, [ KC.G, KC.U, KC.X, KC.W, KC.A ]), # ぐゎ
     (  set()     , { KC.NGV, KC.NGL, KC.NGJ    }, [ KC.T, KC.S, KC.A             ]), # つぁ
 
-    ({ KC.NGD, KC.NGF    }, { KC.NGSCLN }, [ KC.LCTL(KC.K)                                       ]), # ^i
-    ({ KC.NGD, KC.NGF    }, { KC.NGSLSH }, [ KC.LCTL(KC.J)                                       ]), # ^u
     ({ KC.NGJ, KC.NGK    }, { KC.NGD    }, [ KC.LSFT(KC.SLSH), KC.ENT                            ]), # ？{改行}
     ({ KC.NGJ, KC.NGK    }, { KC.NGC    }, [ KC.LSFT(KC.N1), KC.ENT                              ]), # ！{改行}
 
+    ({ KC.NGJ, KC.NGK    }, { KC.NGQ    }, [ KC.LGUI(KC.DOWN)                                   ]), # ^{End}
+    ({ KC.NGJ, KC.NGK    }, { KC.NGE    }, [ KC.D, KC.H, KC.I                                   ]), # /*ディ*/
+    ({ KC.NGJ, KC.NGK    }, { KC.NGR    }, [ KC.LGUI(KC.S)                                      ]), # ^s
+    ({ KC.NGJ, KC.NGK    }, { KC.NGV    }, [ KC.ENT, KC.DOWN                                    ]), # {改行}{↓}
+    ({ KC.NGJ, KC.NGK    }, { KC.NGB    }, [ KC.ENT, KC.LEFT                                    ]), # {改行}{←}
+    ({ KC.NGD, KC.NGF    }, { KC.NGY    }, [ KC.LCTL(KC.A)                                      ]), # {Home}
+    ({ KC.NGD, KC.NGF    }, { KC.NGU    }, [ KC.LSFT(KC.LCTL(KC.E)), KC.BSPC                    ]), # +{End}{BS}
+    ({ KC.NGD, KC.NGF    }, { KC.NGI    }, [ KC.LANG1, KC.LANG1                                 ]), # {vk1Csc079}
+    ({ KC.NGD, KC.NGF    }, { KC.NGO    }, [ KC.DEL                                             ]), # {Del}
+    ({ KC.NGD, KC.NGF    }, { KC.NGP    }, [ KC.ESC, KC.ESC, KC.ESC                             ]), # {Esc 3}
+    ({ KC.NGD, KC.NGF    }, { KC.NGH    }, [ KC.ENT, KC.LCTL(KC.E)                              ]), # {Enter}{End}
+    ({ KC.NGD, KC.NGF    }, { KC.NGJ    }, [ KC.UP                                              ]), # {↑}
+    ({ KC.NGD, KC.NGF    }, { KC.NGK    }, [ KC.LSFT(KC.UP)                                     ]), # +{↑}
+    ({ KC.NGD, KC.NGF    }, { KC.NGL    }, [ KC.LSFT(KC.UP)] * 7                                 ), # +{↑ 7}
+    ({ KC.NGD, KC.NGF    }, { KC.NGSCLN }, [ KC.LCTL(KC.K)                                      ]), # ^i
+    ({ KC.NGD, KC.NGF    }, { KC.NGN    }, [ KC.LCTL(KC.E)                                      ]), # {End}
+    ({ KC.NGD, KC.NGF    }, { KC.NGM    }, [ KC.DOWN                                            ]), # {↓}
+    ({ KC.NGD, KC.NGF    }, { KC.NGCOMM }, [ KC.LSFT(KC.DOWN)                                   ]), # +{↓}
+    ({ KC.NGD, KC.NGF    }, { KC.NGDOT  }, [ KC.LSFT(KC.DOWN)] * 7                               ), # +{↓ 7}
+    ({ KC.NGD, KC.NGF    }, { KC.NGSLSH }, [ KC.LCTL(KC.J)                                      ]), # ^u
+    ({ KC.NGM, KC.NGCOMM }, { KC.NGQ    }, [ KC.LCTL(KC.A), KC.RIGHT, KC.LCTL(KC.E), KC.DEL, KC.DEL, KC.DEL, KC.DEL, KC.LEFT ]), # {Home}{→}{End}{Del 4}{←}
+    ({ KC.NGM, KC.NGCOMM }, { KC.NGE    }, [ KC.LCTL(KC.A), KC.ENT, KC.SPC, KC.SPC, KC.SPC, KC.LEFT ]), # {Home}{改行}{Space 3}{←}
+    ({ KC.NGM, KC.NGCOMM }, { KC.NGR    }, [ KC.SPC, KC.SPC, KC.SPC                             ]), # {Space 3}
+    ({ KC.NGM, KC.NGCOMM }, { KC.NGA    }, [ KC.LCTL(KC.A), KC.RIGHT, KC.LCTL(KC.E), KC.DEL, KC.DEL, KC.LEFT ]), # {Home}{→}{End}{Del 2}{←}
+    ({ KC.NGM, KC.NGCOMM }, { KC.NGD    }, [ KC.LCTL(KC.A), KC.ENT, KC.SPC, KC.LEFT             ]), # {Home}{改行}{Space 1}{←}
+    ({ KC.NGM, KC.NGCOMM }, { KC.NGB    }, [ KC.ENT, KC.LCTL(KC.E), KC.ENT, KC.SPC              ]), # {改行}{End}{改行}{Space}
+    ({ KC.NGC, KC.NGV    }, { KC.NGY    }, [ KC.LSFT(KC.LCTL(KC.A))                             ]), # +{Home}
+    ({ KC.NGC, KC.NGV    }, { KC.NGU    }, [ KC.LGUI(KC.X)                                      ]), # ^x
+    ({ KC.NGC, KC.NGV    }, { KC.NGI    }, [ KC.LGUI(KC.V)                                      ]), # ^v
+    ({ KC.NGC, KC.NGV    }, { KC.NGO    }, [ KC.LSFT(KC.LGUI(KC.Z))                             ]), # ^y
+    ({ KC.NGC, KC.NGV    }, { KC.NGP    }, [ KC.LGUI(KC.Z)                                      ]), # ^z
+    ({ KC.NGC, KC.NGV    }, { KC.NGH    }, [ KC.LGUI(KC.C)                                      ]), # ^c
+    ({ KC.NGC, KC.NGV    }, { KC.NGJ    }, [ KC.RIGHT                                           ]), # {→}
+    ({ KC.NGC, KC.NGV    }, { KC.NGK    }, [ KC.LSFT(KC.RIGHT)                                  ]), # +{→}
+    ({ KC.NGC, KC.NGV    }, { KC.NGL    }, [ KC.LSFT(KC.RIGHT)] * 5                              ), # +{→ 5}
+    ({ KC.NGC, KC.NGV    }, { KC.NGSCLN }, [ KC.LSFT(KC.RIGHT)] * 20                             ), # +{→ 20}
+    ({ KC.NGC, KC.NGV    }, { KC.NGN    }, [ KC.LSFT(KC.LCTL(KC.E))                             ]), # +{End}
+    ({ KC.NGC, KC.NGV    }, { KC.NGM    }, [ KC.LEFT                                            ]), # {←}
+    ({ KC.NGC, KC.NGV    }, { KC.NGCOMM }, [ KC.LSFT(KC.LEFT)                                   ]), # +{←}
+    ({ KC.NGC, KC.NGV    }, { KC.NGDOT  }, [ KC.LSFT(KC.LEFT)] * 5                               ), # +{← 5}
+    ({ KC.NGC, KC.NGV    }, { KC.NGSLSH }, [ KC.LSFT(KC.LEFT)] * 20                              ), # +{← 20}
 
 ]
