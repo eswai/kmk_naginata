@@ -34,21 +34,22 @@ def ng_press(*args, **kwargs):
         nginput[-1] = nginput[-1] + [kc]
     # 前のキーと同時押しはない
     else:
-        # 連続シフトする
-        # がある　がる x (JIの組み合わせがあるからJがC/Oされる) strictモードを作る
-        # あいあう　あいう x
-        # ぎょあう　ぎょう x
-        # どか どが x 先にFがc/oされてJが残される
-        for rs in [{KC.NGD, KC.NGF}, {KC.NGC, KC.NGV}, {KC.NGJ, KC.NGK}, {KC.NGM, KC.NGCOMM}, {KC.NGSFT}, {KC.NGSFT2}, {KC.NGF}, {KC.NGV}, {KC.NGJ}, {KC.NGM}]:
-            rskc = list(rs)
-            rskc.append(kc)
-            if kc not in rs and rs <= pressed_keys and number_of_candidates(rskc, True) > 0:
-                nginput.append(rskc)
-                break
-        # 連続シフトではない
-        else:
-            nginput.append([kc])
-            # pressed_keys.discard(KC.NGSFT)
+        nginput.append([kc])
+        # pressed_keys.discard(KC.NGSFT)
+
+    # 連続シフトする
+    # がある　がる x (JIの組み合わせがあるからJがC/Oされる) strictモードを作る
+    # あいあう　あいう x
+    # ぎょあう　ぎょう x
+    # どか どが x 先にFがc/oされてJが残される
+    for rs in [{KC.NGD, KC.NGF}, {KC.NGC, KC.NGV}, {KC.NGJ, KC.NGK}, {KC.NGM, KC.NGCOMM}, {KC.NGSFT}, {KC.NGSFT2}, {KC.NGF}, {KC.NGV}, {KC.NGJ}, {KC.NGM}]:
+        rskc = list(rs) + nginput[-1]
+        # rskc.append(kc)
+        # じょじょ よを先に押すと連続シフトしない x
+        # Falseにすると、がる が　がある になる x
+        if kc not in rs and rs <= pressed_keys and number_of_candidates(rskc, True) > 0:
+            nginput[-1] = rskc
+            break
 
     if len(nginput) > 1 or number_of_candidates(nginput[0]) == 1:
         ng_type(nginput[0])
@@ -102,7 +103,6 @@ def number_of_candidates(keys, strict = False):
         if keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) == 1:
             noc = 1
         elif keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) > 1:
-            # skc = set(map(lambda x: KC.NGSFT if x == KC.NGSFT2 else x, keys[1:])) # ２文字目以降にNGSFTは来ないはず
             skc = set(keys[1:])
             for k in ngdic:
                 if KC.NGSFT in k[0] and skc == k[1]:
@@ -355,6 +355,7 @@ ngdic = [
     ({ KC.NGJ, KC.NGK    }, { KC.NGD    }, [ KC.LSFT(KC.SLSH), KC.ENT                            ]), # ？{改行}
     ({ KC.NGJ, KC.NGK    }, { KC.NGC    }, [ KC.LSFT(KC.N1), KC.ENT                              ]), # ！{改行}
 
+    # Mac縦書き
     ({ KC.NGJ, KC.NGK    }, { KC.NGQ    }, [ KC.LGUI(KC.DOWN)                                   ]), # ^{End}
     ({ KC.NGJ, KC.NGK    }, { KC.NGE    }, [ KC.D, KC.H, KC.I                                   ]), # /*ディ*/
     ({ KC.NGJ, KC.NGK    }, { KC.NGR    }, [ KC.LGUI(KC.S)                                      ]), # ^s
