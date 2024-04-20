@@ -359,11 +359,19 @@ ngdic = [
 
     # Mac縦書き
     ({ KC.NGJ, KC.NGK    }, { KC.NGQ    }, [ KC.LGUI(KC.DOWN)                                   ]), # ^{End}
-    ({ KC.NGJ, KC.NGK    }, { KC.NGW    }, [ unicode_string_sequence('『』'), KC.UP              ]), # 『』{改行}{↑}
+    ({ KC.NGJ, KC.NGK    }, { KC.NGW    }, [ unicode_string_sequence('『』'), KC.UP             ]), # 『』{改行}{↑}
     ({ KC.NGJ, KC.NGK    }, { KC.NGE    }, [ KC.D, KC.H, KC.I                                   ]), # /*ディ*/
     ({ KC.NGJ, KC.NGK    }, { KC.NGR    }, [ KC.LGUI(KC.S)                                      ]), # ^s
+    ({ KC.NGJ, KC.NGK    }, { KC.NGT    }, [ KC.SLSH                                            ]), # ・
+    ({ KC.NGJ, KC.NGK    }, { KC.NGA    }, [ unicode_string_sequence('……')                    ]), # ……{改行}
+    ({ KC.NGJ, KC.NGK    }, { KC.NGS    }, [ unicode_string_sequence('()'), KC.UP               ]), # (){改行}{↑}
+    ({ KC.NGJ, KC.NGK    }, { KC.NGF    }, [ unicode_string_sequence(''), KC.UP                 ]), # 「」{改行}{↑}
+    ({ KC.NGJ, KC.NGK    }, { KC.NGG    }, [ unicode_string_sequence('《》'), KC.UP             ]), # 《》{改行}{↑}
+    ({ KC.NGJ, KC.NGK    }, { KC.NGZ    }, [ unicode_string_sequence('――')                    ]), # ――{改行}
+    ({ KC.NGJ, KC.NGK    }, { KC.NGX    }, [ unicode_string_sequence('【】'), KC.UP             ]), # 【】{改行}{↑}
     ({ KC.NGJ, KC.NGK    }, { KC.NGV    }, [ KC.ENT, KC.DOWN                                    ]), # {改行}{↓}
     ({ KC.NGJ, KC.NGK    }, { KC.NGB    }, [ KC.ENT, KC.LEFT                                    ]), # {改行}{←}
+
     ({ KC.NGD, KC.NGF    }, { KC.NGY    }, [ KC.LCTL(KC.A)                                      ]), # {Home}
     ({ KC.NGD, KC.NGF    }, { KC.NGU    }, [ KC.LSFT(KC.LCTL(KC.E)), KC.BSPC                    ]), # +{End}{BS}
     ({ KC.NGD, KC.NGF    }, { KC.NGI    }, [ KC.LANG1, KC.LANG1                                 ]), # {vk1Csc079}
@@ -379,12 +387,23 @@ ngdic = [
     ({ KC.NGD, KC.NGF    }, { KC.NGCOMM }, [ KC.LSFT(KC.DOWN)                                   ]), # +{↓}
     ({ KC.NGD, KC.NGF    }, { KC.NGDOT  }, [ KC.LSFT(KC.DOWN)] * 7                               ), # +{↓ 7}
     ({ KC.NGD, KC.NGF    }, { KC.NGSLSH }, [ KC.LCTL(KC.J)                                      ]), # ^u
+
     ({ KC.NGM, KC.NGCOMM }, { KC.NGQ    }, [ KC.LCTL(KC.A), KC.RIGHT, KC.LCTL(KC.E), KC.DEL, KC.DEL, KC.DEL, KC.DEL, KC.LEFT ]), # {Home}{→}{End}{Del 4}{←}
+    ({ KC.NGM, KC.NGCOMM }, { KC.NGW    }, [ KC.LGUI(KC.X), unicode_string_sequence('『'), KC.LGUI(KC.V), unicode_string_sequence('』'), KC.SPC, KC.LSFT(KC.UP), KC.LGUI(KC.X)]), # ^x『^v』{改行}{Space}+{↑}^x
     ({ KC.NGM, KC.NGCOMM }, { KC.NGE    }, [ KC.LCTL(KC.A), KC.ENT, KC.SPC, KC.SPC, KC.SPC, KC.LEFT ]), # {Home}{改行}{Space 3}{←}
     ({ KC.NGM, KC.NGCOMM }, { KC.NGR    }, [ KC.SPC, KC.SPC, KC.SPC                             ]), # {Space 3}
+    ({ KC.NGM, KC.NGCOMM }, { KC.NGT    }, [ unicode_string_sequence('〇')                      ]), # 〇{改行}
     ({ KC.NGM, KC.NGCOMM }, { KC.NGA    }, [ KC.LCTL(KC.A), KC.RIGHT, KC.LCTL(KC.E), KC.DEL, KC.DEL, KC.LEFT ]), # {Home}{→}{End}{Del 2}{←}
+    ({ KC.NGM, KC.NGCOMM }, { KC.NGS    }, [ KC.LGUI(KC.X), unicode_string_sequence('('), KC.LGUI(KC.V), unicode_string_sequence(')'), KC.SPC, KC.LSFT(KC.UP), KC.LGUI(KC.X)]), # ^x(^v){改行}{Space}+{↑}^x
     ({ KC.NGM, KC.NGCOMM }, { KC.NGD    }, [ KC.LCTL(KC.A), KC.ENT, KC.SPC, KC.LEFT             ]), # {Home}{改行}{Space 1}{←}
+    ({ KC.NGM, KC.NGCOMM }, { KC.NGF    }, [ KC.LGUI(KC.X), unicode_string_sequence('「'), KC.LGUI(KC.V), unicode_string_sequence('」'), KC.SPC, KC.LSFT(KC.UP), KC.LGUI(KC.X)]), # ^x「^v」{改行}{Space}+{↑}^x
+    ({ KC.NGM, KC.NGCOMM }, { KC.NGG    }, [ KC.LGUI(KC.X), unicode_string_sequence('｜'), KC.LGUI(KC.V), unicode_string_sequence('《》'), KC.UP, KC.SPC, KC.LSFT(KC.UP), KC.LGUI(KC.X)]), # ^x｜{改行}^v《》{改行}{↑}{Space}+{↑}^x
+    ({ KC.NGM, KC.NGCOMM }, { KC.NGZ    }, [ unicode_string_sequence('　　　×　　　×　　　×'), KC.ENT]), # 　　　×　　　×　　　×{改行 2}
+    ({ KC.NGM, KC.NGCOMM }, { KC.NGX    }, [ KC.LGUI(KC.X), unicode_string_sequence('【'), KC.LGUI(KC.V), unicode_string_sequence('】'), KC.SPC, KC.LSFT(KC.UP), KC.LGUI(KC.X)]), # ^x【^v】{改行}{Space}+{↑}^x
+    ({ KC.NGM, KC.NGCOMM }, { KC.NGC    }, [ unicode_string_sequence('／')                      ]), # ／{改行}
+    ({ KC.NGM, KC.NGCOMM }, { KC.NGV    }, [ KC.ENT, KC.LCTL(KC.E), unicode_string_sequence('「」'), KC.UP]), # {改行}{End}{改行}「」{改行}{↑}
     ({ KC.NGM, KC.NGCOMM }, { KC.NGB    }, [ KC.ENT, KC.LCTL(KC.E), KC.ENT, KC.SPC              ]), # {改行}{End}{改行}{Space}
+
     ({ KC.NGC, KC.NGV    }, { KC.NGY    }, [ KC.LSFT(KC.LCTL(KC.A))                             ]), # +{Home}
     ({ KC.NGC, KC.NGV    }, { KC.NGU    }, [ KC.LGUI(KC.X)                                      ]), # ^x
     ({ KC.NGC, KC.NGV    }, { KC.NGI    }, [ KC.LGUI(KC.V)                                      ]), # ^v
