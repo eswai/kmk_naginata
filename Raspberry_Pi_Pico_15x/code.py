@@ -11,7 +11,7 @@ from kmk.scanners import DiodeOrientation
 from kmk.modules.layers import Layers
 from kmk.modules.combos import Combos, Chord, Sequence
 from kmk.modules.holdtap import HoldTap
-from naginata import ng_initialize
+from naginata_15x import ng_initialize
 from kmk.consts import UnicodeMode
 
 keyboard = KMKKeyboard()

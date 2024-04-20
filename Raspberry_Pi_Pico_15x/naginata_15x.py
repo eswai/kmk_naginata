@@ -1,3 +1,5 @@
+# 薙刀式 v15x 実装
+
 import supervisor
 
 from kmk.keys import KC
