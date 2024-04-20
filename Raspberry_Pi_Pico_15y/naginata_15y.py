@@ -6,12 +6,13 @@ from kmk.keys import KC
 from kmk.keys import make_key
 from kmk.handlers.sequences import send_string
 from kmk.handlers.sequences import simple_key_sequence
+from kmk.handlers.sequences import unicode_string_sequence
 
 pressed_keys = set() # 同時に押しているキー
-nginput = [] # 未変換のキー
-ng_layer = 0
-kblayers = None
-kb = None
+nginput = [] # 未変換のキー [[KC.NGM], [KC.NGJ, KC.NGW]] (なぎ)のように、同時押しの組み合わせを2次元配列へ格納
+ng_layer = 0 # KC.NG*を定義しているレイヤーの番号
+kblayers = None # Layersオブジェクト
+kb = None # KMKKeyboardオブジェクト
 
 def ng_initialize(_kb, _layers, _ng_layer):
     global kb, kblayers, ng_layer
@@ -62,6 +63,7 @@ def ng_release(*args, **kwargs):
     kc = args[0]
     pressed_keys.discard(kc)
 
+    # 全部キーを離したらバッファを全部吐き出す
     if len(pressed_keys) == 0:
         while len(nginput) > 0:
             ng_type(nginput[0])
@@ -357,6 +359,7 @@ ngdic = [
 
     # Mac縦書き
     ({ KC.NGJ, KC.NGK    }, { KC.NGQ    }, [ KC.LGUI(KC.DOWN)                                   ]), # ^{End}
+    ({ KC.NGJ, KC.NGK    }, { KC.NGW    }, [ unicode_string_sequence('『』'), KC.UP              ]), # 『』{改行}{↑}
     ({ KC.NGJ, KC.NGK    }, { KC.NGE    }, [ KC.D, KC.H, KC.I                                   ]), # /*ディ*/
     ({ KC.NGJ, KC.NGK    }, { KC.NGR    }, [ KC.LGUI(KC.S)                                      ]), # ^s
     ({ KC.NGJ, KC.NGK    }, { KC.NGV    }, [ KC.ENT, KC.DOWN                                    ]), # {改行}{↓}

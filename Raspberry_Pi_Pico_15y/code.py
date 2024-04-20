@@ -11,7 +11,7 @@ from kmk.scanners import DiodeOrientation
 from kmk.modules.layers import Layers
 from kmk.modules.combos import Combos, Chord, Sequence
 from kmk.modules.holdtap import HoldTap
-from naginata import ng_initialize
+from naginata_15y import ng_initialize
 from kmk.consts import UnicodeMode
 
 keyboard = KMKKeyboard()
@@ -20,7 +20,7 @@ keyboard.debug_enabled = True
 keyboard.col_pins = (board.GP15, board.GP14, board.GP13, board.GP12, board.GP11, board.GP20, board.GP19, board.GP18, board.GP17, board.GP16,)
 keyboard.row_pins = (board.GP7, board.GP8, board.GP9, board.GP10,)
 keyboard.diode_orientation = DiodeOrientation.COL2ROW
-keyboard.unicode_mode = UnicodeMode.WINC
+keyboard.unicode_mode = UnicodeMode.MACOS
 
 combos = Combos()
 keyboard.modules.append(combos)
@@ -46,14 +46,6 @@ ng_initialize(keyboard, layers, 1)
 combos.combos = [
     Chord((KC.H  , KC.J  ), KC.NGON , timeout = 100, per_key_timeout = False, fast_reset = True),
     Chord((KC.NGF, KC.NGG), KC.NGOFF, timeout = 100, per_key_timeout = False, fast_reset = True),
-    # Chord((KC.D  , KC.F     ), KC.NGH1),
-    # Chord((KC.NGD, KC.NGF   ), KC.NGH1),
-    # Chord((KC.J  , KC.K     ), KC.NGH1),
-    # Chord((KC.NGJ, KC.NGK   ), KC.NGH1),
-    # Chord((KC.C  , KC.V     ), KC.NGH2),
-    # Chord((KC.NGC, KC.NGV   ), KC.NGH2),
-    # Chord((KC.M  , KC.COMM  ), KC.NGH2),
-    # Chord((KC.NGM, KC.NGCOMM), KC.NGH2),
 ]
 
 keyboard.keymap = [
