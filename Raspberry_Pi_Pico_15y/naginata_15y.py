@@ -20,7 +20,14 @@ def ng_initialize(_kb, _layers, _ng_layer):
     kblayers = _layers
     ng_layer = _ng_layer
 
-#　かな変換の処理
+def ng_unicode_string_sequence(str):
+    r = [KC.LANG2, KC.LCTL(KC.F20)]
+    r.append(unicode_string_sequence(str))
+    r.append(KC.LSFT(KC.LANG1))
+    r.append(KC.LANG1)
+    return r
+
+# かな変換の処理
 def ng_press(*args, **kwargs):
     global pressed_keys, now
     kc = args[0]
@@ -146,7 +153,12 @@ def number_of_candidates(keys, strict = False):
                 skc = set(keys)
                 for k in ngdic:
                     if not k[0] and skc <= k[1]: # <=だけ違う
-                        noc += 1
+                        # シェ、チェは２文字タイプしたらnoc = 1になるが、まだ２キーしか押してないので、早期確定してはいけない。
+                        if len(keys) < len(k[1]):
+                            noc = 2
+                            break
+                        else:
+                            noc += 1
 
     print('NG num of candidates %d (%d)' % (noc, strict))
     return noc
