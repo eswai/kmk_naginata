@@ -1,18 +1,17 @@
 # Vpico KMK薙刀式
 
-print("Starting")
-
-import board
 import gc
-
-from kmk.kmk_keyboard import KMKKeyboard
-from kmk.keys import KC
-from kmk.scanners import DiodeOrientation
-from kmk.modules.layers import Layers
-from kmk.modules.combos import Combos, Chord, Sequence
-from kmk.modules.holdtap import HoldTap
-from naginata_15y import ng_initialize
+import board
 from kmk.consts import UnicodeMode
+from naginata_15y import ng_initialize
+from kmk.modules.holdtap import HoldTap
+from kmk.modules.combos import Combos, Chord, Sequence
+from kmk.modules.layers import Layers
+from kmk.scanners import DiodeOrientation
+from kmk.keys import KC
+from kmk.kmk_keyboard import KMKKeyboard
+
+print("Starting")
 
 keyboard = KMKKeyboard()
 keyboard.debug_enabled = True
@@ -20,7 +19,7 @@ keyboard.debug_enabled = True
 keyboard.col_pins = (board.GP15, board.GP14, board.GP13, board.GP12, board.GP11, board.GP20, board.GP19, board.GP18, board.GP17, board.GP16,)
 keyboard.row_pins = (board.GP7, board.GP8, board.GP9, board.GP10,)
 keyboard.diode_orientation = DiodeOrientation.COL2ROW
-keyboard.unicode_mode = UnicodeMode.MACOS
+keyboard.unicode_mode = UnicodeMode.WINC
 
 combos = Combos()
 keyboard.modules.append(combos)
@@ -44,8 +43,8 @@ NGTG = KC.TG(1)
 ng_initialize(keyboard, layers, 1)
 
 combos.combos = [
-    Chord((KC.H  , KC.J  ), KC.NGON , timeout = 100, per_key_timeout = False, fast_reset = True),
-    Chord((KC.NGF, KC.NGG), KC.NGOFF, timeout = 100, per_key_timeout = False, fast_reset = True),
+    Chord((KC.H, KC.J), KC.NGON, timeout=100, per_key_timeout=False, fast_reset=True),
+    Chord((KC.NGF, KC.NGG), KC.NGOFF, timeout=100, per_key_timeout=False, fast_reset=True),
 ]
 
 keyboard.keymap = [

@@ -8,17 +8,19 @@ from kmk.handlers.sequences import send_string
 from kmk.handlers.sequences import simple_key_sequence
 from kmk.handlers.sequences import unicode_string_sequence
 
-pressed_keys = set() # 同時に押しているキー
-nginput = [] # 未変換のキー [[KC.NGM], [KC.NGJ, KC.NGW]] (なぎ)のように、同時押しの組み合わせを2次元配列へ格納
-ng_layer = 0 # KC.NG*を定義しているレイヤーの番号
-kblayers = None # Layersオブジェクト
-kb = None # KMKKeyboardオブジェクト
+pressed_keys = set()  # 同時に押しているキー
+nginput = []  # 未変換のキー [[KC.NGM], [KC.NGJ, KC.NGW]] (なぎ)のように、同時押しの組み合わせを2次元配列へ格納
+ng_layer = 0  # KC.NG*を定義しているレイヤーの番号
+kblayers = None  # Layersオブジェクト
+kb = None  # KMKKeyboardオブジェクト
+
 
 def ng_initialize(_kb, _layers, _ng_layer):
     global kb, kblayers, ng_layer
     kb = _kb
     kblayers = _layers
     ng_layer = _ng_layer
+
 
 def ng_unicode_string_sequence(str):
     r = [KC.LANG2, KC.LCTL(KC.F20)]
@@ -38,6 +40,7 @@ def ng_press(*args, **kwargs):
         nginput.append([kc])
     # 前のキーとの同時押しの可能性があるなら前に足す
     # 同じキー連打を除外
+    # V, H, EでVHがロールオーバーすると「こくて」=[[V,H], [E]]になる。「こりゃ」は[[V],[H,E]]。
     elif len(nginput) > 0 and nginput[-1][-1] != kc and number_of_candidates(nginput[-1] + [kc]) > 0:
         nginput[-1] = nginput[-1] + [kc]
     # 前のキーと同時押しはない
@@ -65,6 +68,7 @@ def ng_press(*args, **kwargs):
 
     return False
 
+
 def ng_release(*args, **kwargs):
     global pressed_keys, now
     kc = args[0]
@@ -78,6 +82,7 @@ def ng_release(*args, **kwargs):
 
     return False
 
+
 def ng_type(keys):
     if len(keys) == 0:
         return
@@ -85,14 +90,14 @@ def ng_type(keys):
     if len(keys) == 1 and keys[0] == KC.NGSFT2:
         kb.tap_key(KC.ENT)
         return
-    
+
     skc = set(map(lambda x: KC.NGSFT if x == KC.NGSFT2 else x, keys))
     for k in ngdic:
         if skc == (k[0] | k[1]):
-            if type(k[2]) is list:
+            if isinstance(k[2], list):
                 kb.tap_key(simple_key_sequence(k[2]))
             else:
-                k[2]() # lambda
+                k[2]()  # lambda
             break
     # JIみたいにJIを含む同時押しはたくさんあるが、JIのみの同時押しがないとき
     # 最後の１キーを別に分けて変換する
@@ -101,12 +106,13 @@ def ng_type(keys):
         ng_type(keys)
         ng_type([kl])
 
-def number_of_candidates(keys, strict = False):
+
+def number_of_candidates(keys, strict=False):
     if not keys:
         return 0
 
     noc = 0
-    
+
     # skc = set(map(lambda x: KC.NGSFT if x == KC.NGSFT2 else x, keys))
     if strict:
         if keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) == 1:
@@ -137,7 +143,7 @@ def number_of_candidates(keys, strict = False):
         elif keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) > 1:
             skc = set(keys[1:])
             for k in ngdic:
-                if KC.NGSFT in k[0] and skc <= k[1]: # <=だけ違う
+                if KC.NGSFT in k[0] and skc <= k[1]:  # <=だけ違う
                     noc += 1
         else:
             for rs in [{KC.NGD, KC.NGF}, {KC.NGC, KC.NGV}, {KC.NGJ, KC.NGK}, {KC.NGM, KC.NGCOMM}]:
@@ -152,7 +158,7 @@ def number_of_candidates(keys, strict = False):
             else:
                 skc = set(keys)
                 for k in ngdic:
-                    if not k[0] and skc <= k[1]: # <=だけ違う
+                    if not k[0] and skc <= k[1]:  # <=だけ違う
                         # シェ、チェは２文字タイプしたらnoc = 1になるが、まだ２キーしか押してないので、早期確定してはいけない。
                         if len(keys) < len(k[1]):
                             noc = 2
@@ -163,12 +169,14 @@ def number_of_candidates(keys, strict = False):
     print('NG num of candidates %d (%d)' % (noc, strict))
     return noc
 
+
 def naginata_on(*args, **kwargs):
     kblayers.activate_layer(kb, ng_layer)
     nginput.clear()
     kb.tap_key(KC.LANG1)
     kb.tap_key(KC.INT4)
     return False
+
 
 def naginata_off(*args, **kwargs):
     kblayers.deactivate_layer(kb, ng_layer)
@@ -177,18 +185,19 @@ def naginata_off(*args, **kwargs):
     kb.tap_key(KC.INT5)
     return False
 
+
 # キーの定義
 ngkeys = [
-    'NGQ', 'NGW', 'NGE', 'NGR', 'NGT', 'NGY', 'NGU', 'NGI', 'NGO', 'NGP', 
+    'NGQ', 'NGW', 'NGE', 'NGR', 'NGT', 'NGY', 'NGU', 'NGI', 'NGO', 'NGP',
     'NGA', 'NGS', 'NGD', 'NGF', 'NGG', 'NGH', 'NGJ', 'NGK', 'NGL', 'NGSCLN',
     'NGZ', 'NGX', 'NGC', 'NGV', 'NGB', 'NGN', 'NGM', 'NGCOMM', 'NGDOT', 'NGSLSH',
     'NGSFT', 'NGSFT2'
 ]
 for k in ngkeys:
-    make_key(names=(k,), on_press = ng_press, on_release = ng_release)
+    make_key(names=(k,), on_press=ng_press, on_release=ng_release)
 
-make_key(names=('NGON' ,), on_release = naginata_on) # on_releaseの方が安定する
-make_key(names=('NGOFF',), on_release = naginata_off)
+make_key(names=('NGON',), on_release=naginata_on)  # on_releaseの方が安定する
+make_key(names=('NGOFF',), on_release=naginata_off)
 
 # かな変換テーブル setはdictionaryのキーにできないので配列に
 # れ、をプレス時に出したい x
