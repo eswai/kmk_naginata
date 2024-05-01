@@ -4,7 +4,6 @@ import supervisor
 
 from kmk.keys import KC
 from kmk.keys import make_key
-from kmk.handlers.sequences import send_string
 from kmk.handlers.sequences import simple_key_sequence
 from kmk.handlers.sequences import unicode_string_sequence
 
@@ -16,22 +15,25 @@ kb = None  # KMKKeyboardオブジェクト
 
 
 def ng_initialize(_kb, _layers, _ng_layer):
+    """初期化"""
     global kb, kblayers, ng_layer
     kb = _kb
     kblayers = _layers
     ng_layer = _ng_layer
 
 
-def ng_unicode_string_sequence(str):
+def ng_unicode_string_sequence(s):
+    """UNICODE出力、MacではUincode Hex Inputに切り替える"""
     r = [KC.LANG2, KC.LCTL(KC.F20)]
-    r.append(unicode_string_sequence(str))
+    r.append(unicode_string_sequence(s))
     r.append(KC.LSFT(KC.LANG1))
     r.append(KC.LANG1)
     return r
 
 # かな変換の処理
 def ng_press(*args, **kwargs):
-    global pressed_keys, now
+    """薙刀式の処理、キー押下時"""
+    global pressed_keys
     kc = args[0]
     pressed_keys.add(kc)
 
@@ -58,7 +60,7 @@ def ng_press(*args, **kwargs):
         # rskc.append(kc)
         # じょじょ よを先に押すと連続シフトしない x
         # Falseにすると、がる が　がある になる x
-        if kc not in rs and rs <= pressed_keys and number_of_candidates(rskc, True) > 0:
+        if kc not in rs and rs <= pressed_keys and number_of_matches(rskc) > 0:
             nginput[-1] = rskc
             break
 
@@ -70,7 +72,8 @@ def ng_press(*args, **kwargs):
 
 
 def ng_release(*args, **kwargs):
-    global pressed_keys, now
+    """薙刀式の処理、キー離し時"""
+    global pressed_keys
     kc = args[0]
     pressed_keys.discard(kc)
 
@@ -84,6 +87,7 @@ def ng_release(*args, **kwargs):
 
 
 def ng_type(keys):
+    """キー出力する"""
     if len(keys) == 0:
         return
 
@@ -107,70 +111,90 @@ def ng_type(keys):
         ng_type([kl])
 
 
-def number_of_candidates(keys, strict=False):
+def number_of_matches(keys):
+    """一致した候補の数を返す"""
     if not keys:
         return 0
 
     noc = 0
 
     # skc = set(map(lambda x: KC.NGSFT if x == KC.NGSFT2 else x, keys))
-    if strict:
-        if keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) == 1:
-            noc = 1
-        elif keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) > 1:
-            skc = set(keys[1:])
-            for k in ngdic:
-                if KC.NGSFT in k[0] and skc == k[1]:
-                    noc += 1
-        else:
-            for rs in [{KC.NGD, KC.NGF}, {KC.NGC, KC.NGV}, {KC.NGJ, KC.NGK}, {KC.NGM, KC.NGCOMM}]:
-                if len(keys) == 3 and set(keys[0:2]) == rs:
-                    for k in ngdic:
-                        if k[0] == rs and {keys[2]} == k[1]:
-                            noc = 1
-                            break
-                    else:
-                        continue
+    if keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) == 1:
+        noc = 1
+    elif keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) > 1:
+        skc = set(keys[1:])
+        for k in ngdic:
+            if KC.NGSFT in k[0] and skc == k[1]:
+                noc += 1
+                if noc > 1:
                     break
-            else:
-                skc = set(keys)
-                for k in ngdic:
-                    if not k[0] and skc == k[1]:
-                        noc += 1
     else:
-        if set(keys) in [{KC.NGSFT}, {KC.NGSFT2}, {KC.NGD, KC.NGF}, {KC.NGC, KC.NGV}, {KC.NGJ, KC.NGK}, {KC.NGM, KC.NGCOMM}]:
-            noc = 2
-        elif keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) > 1:
-            skc = set(keys[1:])
-            for k in ngdic:
-                if KC.NGSFT in k[0] and skc <= k[1]:  # <=だけ違う
-                    noc += 1
-        else:
-            for rs in [{KC.NGD, KC.NGF}, {KC.NGC, KC.NGV}, {KC.NGJ, KC.NGK}, {KC.NGM, KC.NGCOMM}]:
-                if len(keys) == 3 and set(keys[0:2]) == rs:
-                    for k in ngdic:
-                        if k[0] == rs and {keys[2]} == k[1]:
-                            noc = 1
-                            break
-                    else:
-                        continue
-                    break
-            else:
-                skc = set(keys)
+        for rs in [{KC.NGD, KC.NGF}, {KC.NGC, KC.NGV}, {KC.NGJ, KC.NGK}, {KC.NGM, KC.NGCOMM}]:
+            if len(keys) == 3 and set(keys[0:2]) == rs:
                 for k in ngdic:
-                    if not k[0] and skc <= k[1]:  # <=だけ違う
-                        # シェ、チェは２文字タイプしたらnoc = 1になるが、まだ２キーしか押してないので、早期確定してはいけない。
-                        if len(keys) < len(k[1]):
-                            noc = 2
-                            break
-                        else:
-                            noc += 1
+                    if k[0] == rs and {keys[2]} == k[1]:
+                        noc = 1
+                        break
+                else:
+                    continue
+                break
+        else:
+            skc = set(keys)
+            for k in ngdic:
+                if not k[0] and skc == k[1]:
+                    noc += 1
+                    if noc > 1:
+                        break
 
-    print('NG num of candidates %d (%d)' % (noc, strict))
+    print('NG num of matches %d' % noc)
+    return noc
+
+
+def number_of_candidates(keys):
+    """変換候補の数を返す"""
+    if not keys:
+        return 0
+
+    noc = 0
+
+    if set(keys) in [{KC.NGSFT}, {KC.NGSFT2}, {KC.NGD, KC.NGF}, {KC.NGC, KC.NGV}, {KC.NGJ, KC.NGK}, {KC.NGM, KC.NGCOMM}]:
+        noc = 2
+    elif keys[0] in [KC.NGSFT, KC.NGSFT2] and len(keys) > 1:
+        skc = set(keys[1:])
+        for k in ngdic:
+            if KC.NGSFT in k[0] and skc <= k[1]:  # <=だけ違う
+                noc += 1
+                if noc > 1:
+                    break
+    else:
+        for rs in [{KC.NGD, KC.NGF}, {KC.NGC, KC.NGV}, {KC.NGJ, KC.NGK}, {KC.NGM, KC.NGCOMM}]:
+            if len(keys) == 3 and set(keys[0:2]) == rs:
+                for k in ngdic:
+                    if k[0] == rs and {keys[2]} == k[1]:
+                        noc = 1
+                        break
+                else:
+                    continue
+                break
+        else:
+            skc = set(keys)
+            for k in ngdic:
+                if not k[0] and skc <= k[1]:  # <=だけ違う
+                    # シェ、チェは２文字タイプしたらnoc = 1になるが、まだ２キーしか押してないので、早期確定してはいけない。
+                    if len(keys) < len(k[1]):
+                        noc = 2
+                        break
+                    else:
+                        noc += 1
+                        if noc > 1:
+                            break
+
+    print('NG num of candidates %d' % noc)
     return noc
 
 
 def naginata_on(*args, **kwargs):
+    """薙刀式入力をオンにする"""
     kblayers.activate_layer(kb, ng_layer)
     nginput.clear()
     kb.tap_key(KC.LANG1)
@@ -179,6 +203,7 @@ def naginata_on(*args, **kwargs):
 
 
 def naginata_off(*args, **kwargs):
+    """薙刀式入力をオフにする"""
     kblayers.deactivate_layer(kb, ng_layer)
     nginput.clear()
     kb.tap_key(KC.LANG2)
